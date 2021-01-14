@@ -18,25 +18,28 @@ AAProjectile::AAProjectile()
 	{
 		CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
 		CollisionComponent->InitSphereRadius(15.0f);
+		CollisionComponent->SetCollisionProfileName(TEXT("Bullet"));
 
 		RootComponent = CollisionComponent;
 	}
+
 
 	if (!ProjectileMovementComponent)
 	{
 		ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
 		ProjectileMovementComponent->SetUpdatedComponent(CollisionComponent);
-		ProjectileMovementComponent->InitialSpeed = 300.0f;
-		ProjectileMovementComponent->MaxSpeed = 300.0f;
+		ProjectileMovementComponent->InitialSpeed = 1500.0f;
+		ProjectileMovementComponent->MaxSpeed = 3000.0f;
 		ProjectileMovementComponent->bRotationFollowsVelocity = true;
 		ProjectileMovementComponent->bShouldBounce = true;
-		ProjectileMovementComponent->Bounciness = 0.3f;
+		ProjectileMovementComponent->Bounciness = 0.3f; 
 		ProjectileMovementComponent->ProjectileGravityScale = 0.0f;
 	}
 
 	if (!ProjectileMeshComponent)
 	{
 		ProjectileMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ProjectileMeshComponent"));
+		ProjectileMeshComponent->SetCollisionProfileName(TEXT("Bullet"));
 
 		static ConstructorHelpers::FObjectFinder<UStaticMesh>Mesh(TEXT("'/Game/Resources/Sphere.Sphere'"));
 
@@ -62,8 +65,10 @@ AAProjectile::AAProjectile()
 void AAProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	SetLifeSpan(5);
 }
+
 
 // Called every frame
 void AAProjectile::Tick(float DeltaTime)

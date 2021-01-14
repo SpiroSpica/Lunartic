@@ -20,10 +20,17 @@ protected:
 	// Begin PlayerController interface
 	virtual void PlayerTick(float DeltaTime) override;
 	virtual void SetupInputComponent() override;
+	virtual void BeginPlay() override;
 	// End PlayerController interface
 
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
 	TSubclassOf<class AAProjectile> ProjectileClass;
+
+	UPROPERTY()
+	bool isFire;
+
+	UPROPERTY()
+	bool notShooting;
 
 
 
@@ -39,9 +46,25 @@ public:
 	UFUNCTION()
 	void Shoot();
 
+	UFUNCTION()
+	void HitScan();
+	
+	UFUNCTION()
+	void StartShoot();
+
+	UFUNCTION()
+	void EndShoot();
+
+	UFUNCTION()
+	void AttackLimit();
+
+
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	FVector MuzzleOffset;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Timer)
+	FTimerHandle MemberTimerHandle;
 
 };
 
