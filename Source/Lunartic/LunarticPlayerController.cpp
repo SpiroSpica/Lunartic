@@ -19,8 +19,8 @@ void ALunarticPlayerController::PlayerTick(float DeltaTime)
 
 	if (isFire && notShooting)
 	{
-		//Shoot();
-		HitScan();
+		Shoot();
+		//HitScan();
 	}
 }
 
@@ -36,8 +36,9 @@ void ALunarticPlayerController::SetupInputComponent()
 	// set up gameplay key bindings
 	Super::SetupInputComponent();
 
-	InputComponent->BindAction("SetDestination", IE_Pressed, this, &ALunarticPlayerController::StartShoot);
-	InputComponent->BindAction("SetDestination", IE_Released, this, &ALunarticPlayerController::EndShoot);
+	InputComponent->BindAction("LeftClick", IE_Pressed, this, &ALunarticPlayerController::StartShoot);
+	InputComponent->BindAction("LeftClick", IE_Released, this, &ALunarticPlayerController::EndShoot);
+
 
 	InputComponent->BindAxis(TEXT("MoveForWard"), this, &ALunarticPlayerController::UpDown);
 	InputComponent->BindAxis(TEXT("MoveRight"), this, &ALunarticPlayerController::LeftRight);
@@ -80,6 +81,7 @@ void ALunarticPlayerController::LeftRight(float NewAxisValue)
 
 void ALunarticPlayerController::HitScan()
 {
+	notShooting = false;
 	FHitResult target;
 	ACharacter* const MyCharacter = GetCharacter();
 
@@ -97,6 +99,11 @@ void ALunarticPlayerController::HitScan()
 		target.GetActor()->GetName(targetName);
 		//target.GetActor->
 		UE_LOG(LogTemp, Log, TEXT("%s"),*targetName);
+		if (target.GetActor()->Tags.Contains("Enemy"))
+		{
+			ALunarticMonster* Monster = Cast<ALunarticMonster>(target.GetActor());
+			Monster->OnTakeDamage(20);
+		}
 	}
 	else
 	{

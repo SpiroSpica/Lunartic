@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "AProjectile.h"
+#include "LunarticMonster.h"
 #include "LunarticPlayerController.generated.h"
 
 UCLASS()

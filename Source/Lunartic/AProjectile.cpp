@@ -59,6 +59,9 @@ AAProjectile::AAProjectile()
 	ProjectileMeshComponent->SetRelativeScale3D(FVector(0.09f, 0.09f, 0.09f));
 	ProjectileMeshComponent->SetupAttachment(RootComponent);
 
+	
+	CollisionComponent->OnComponentHit.AddDynamic(this, &AAProjectile::OnHit);
+
 }
 
 // Called when the game starts or when spawned
@@ -80,4 +83,19 @@ void AAProjectile::Tick(float DeltaTime)
 void AAProjectile::FireInDirection(const FVector& ShootDirection) 
 {
 	AAProjectile::ProjectileMovementComponent->Velocity = ShootDirection * ProjectileMovementComponent->InitialSpeed;
+}
+
+void AAProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
+{
+	
+	if (Hit.GetActor()->Tags.Contains("Enemy"))
+	{
+		
+		ALunarticMonster* Target = Cast<ALunarticMonster>(Hit.GetActor());
+		Target->OnTakeDamage(20);
+		
+		
+	}
+	SetLifeSpan(0.01f);
+	
 }

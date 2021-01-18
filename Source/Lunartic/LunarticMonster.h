@@ -29,10 +29,16 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(VisibleAnyWhere, Category = Visual)
+	UPROPERTY(EditAnyWhere, Category = Visual)
 	USkeletalMeshComponent* MeshComp;
+
+	UPROPERTY(EditAnyWhere, Category = Stat)
+	int HP;
+
 	UPROPERTY(VisibleAnywhere, Category = Collision)
 	UCapsuleComponent* Capsule;
 
+	UFUNCTION()
+	void OnTakeDamage(int Damage);
 
 };

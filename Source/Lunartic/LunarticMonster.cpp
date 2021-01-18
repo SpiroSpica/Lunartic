@@ -11,8 +11,13 @@ ALunarticMonster::ALunarticMonster()
 	PrimaryActorTick.bCanEverTick = true;
 	ACharacter* const MyCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	
-	Capsule = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CAPSULE"));
-	MeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("MESH"));
+	Capsule = GetCapsuleComponent();
+	
+	MeshComp = GetMesh();
+	if (MeshComp == NULL)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("MeshComp is NULL"));
+	}
 	
 	Capsule->SetCapsuleHalfHeight(96.0f);
 	Capsule->SetCapsuleRadius(42.0f);
@@ -22,6 +27,7 @@ ALunarticMonster::ALunarticMonster()
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> MESH(TEXT("'/Game/Mannequin/Character/Mesh/SK_Mannequin.SK_Mannequin'"));
 	if (MESH.Succeeded())
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Mesh Loaded"));
 		MeshComp->SetSkeletalMesh(MESH.Object);
 	}
 	MeshComp->SetAnimationMode(EAnimationMode::AnimationBlueprint);
@@ -29,11 +35,15 @@ ALunarticMonster::ALunarticMonster()
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM(TEXT("'/Game/Mannequin/Animations/ThirdPerson_AnimBP.ThirdPerson_AnimBP_C'"));
 	if (ANIM.Succeeded())
 	{
+		UE_LOG(LogTemp, Warning, TEXT("AnimBP implemented"));
 		MeshComp->SetAnimInstanceClass(ANIM.Class);
 	}
 	GetCharacterMovement()->bOrientRotationToMovement = true;
+	
 	AIControllerClass = ALunarticMonsterController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+
+	HP = 200;
 }
 
 // Called when the game starts or when spawned
@@ -41,9 +51,19 @@ void ALunarticMonster::BeginPlay()
 {
 	Super::BeginPlay();
 
+	Tags.Add("Enemy");
 	
 	
-	
+}
+
+void ALunarticMonster::OnTakeDamage(int Damage)
+{
+	HP -= Damage;
+	UE_LOG(LogTemp, Warning, TEXT("Current HP: %d"), HP);
+	if (HP < 0)
+	{
+		this->Destroy();
+	}
 }
 
 // Called every frame
