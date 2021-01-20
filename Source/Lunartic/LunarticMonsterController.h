@@ -8,6 +8,9 @@
 #include "LunarticMonster.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/BlackboardData.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "LunarticMonsterController.generated.h"
 
 /**
@@ -27,9 +30,16 @@ public:
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void OnUnPossess() override;
 
+	static const FName TargetKey;
+	static const FName HomePosKey;
+
 private:
 	void OnRepeatTimer();
 	FTimerHandle RepeatTimerHandle;
 	float RepeatInterval;
+
+	UPROPERTY()
+	class UBehaviorTree* BTAsset;
+	class UBlackboardData* BBAsset;
 
 };
