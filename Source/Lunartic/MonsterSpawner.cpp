@@ -13,7 +13,7 @@ AMonsterSpawner::AMonsterSpawner()
 	BuildingMesh = CreateDefaultSubobject<UStaticMeshComponent>("BuildingMesh");
 	SpawnPoint = CreateDefaultSubobject<UParticleSystemComponent>("SpawnPoint");
 
-	SpawnInterval = 0.01;
+	SpawnInterval = 1;
 
 	auto MeshAsset = ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'"));
 	if (MeshAsset.Object != nullptr)

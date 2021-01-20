@@ -6,6 +6,8 @@
 #include "GameFramework/PlayerController.h"
 #include "AProjectile.h"
 #include "LunarticMonster.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "DrawDebugHelpers.h"
 #include "LunarticPlayerController.generated.h"
 
 UCLASS()
@@ -59,7 +61,11 @@ public:
 	UFUNCTION()
 	void AttackLimit();
 
+	UFUNCTION()
+	void Bomb();
 
+	UPROPERTY(VisibleAnyWhere)
+	bool SpecialWeaponFlag;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	FVector MuzzleOffset;

@@ -10,14 +10,16 @@ ALunarticPlayerController::ALunarticPlayerController()
 	bShowMouseCursor = true;
 	isFire = false;
 	notShooting = true;
+	SpecialWeaponFlag = false;
 	DefaultMouseCursor = EMouseCursor::Crosshairs;
+
 }
 
 void ALunarticPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
 
-	if (isFire && notShooting)
+	if (isFire && notShooting && !SpecialWeaponFlag)
 	{
 		Shoot();
 		//HitScan();
@@ -36,10 +38,11 @@ void ALunarticPlayerController::SetupInputComponent()
 	// set up gameplay key bindings
 	Super::SetupInputComponent();
 
+	
 	InputComponent->BindAction("LeftClick", IE_Pressed, this, &ALunarticPlayerController::StartShoot);
 	InputComponent->BindAction("LeftClick", IE_Released, this, &ALunarticPlayerController::EndShoot);
-
-
+	InputComponent->BindAction("SpecialWeapon", IE_Pressed, this, &ALunarticPlayerController::Bomb);
+	
 	InputComponent->BindAxis(TEXT("MoveForWard"), this, &ALunarticPlayerController::UpDown);
 	InputComponent->BindAxis(TEXT("MoveRight"), this, &ALunarticPlayerController::LeftRight);
 	
@@ -47,12 +50,70 @@ void ALunarticPlayerController::SetupInputComponent()
 
 void ALunarticPlayerController::StartShoot()
 {
-	isFire = true;
+	if (SpecialWeaponFlag)
+	{
+		UKismetSystemLibrary::FlushPersistentDebugLines(GetWorld());
+		ALunarticCharacter* MyCharacter = Cast<ALunarticCharacter>(GetCharacter());
+		
+		FVector ExplosionLocation = MyCharacter->GetCursorToWorld()->GetComponentLocation();
+
+		// Set what actors to seek out from it's collision channel
+		TArray<TEnumAsByte<EObjectTypeQuery>> traceObjectTypes;
+		traceObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
+
+		// Ignore any specific actors
+		TArray<AActor*> ignoreActors;
+		// Ignore self or remove this line to not ignore any
+		ignoreActors.Init(this, 1);
+
+		// Array of actors that are inside the radius of the sphere
+		TArray<AActor*> outActors;
+
+		// Total radius of the sphere
+		float radius = 300.0f;
+		
+		// Class that the sphere should hit against and include in the outActors array (Can be null)
+		UClass* seekClass = ALunarticMonster::StaticClass(); // NULL;
+		UKismetSystemLibrary::SphereOverlapActors(GetWorld(), ExplosionLocation, radius, traceObjectTypes, seekClass, ignoreActors, outActors);
+
+		// Optional: Use to have a visual representation of the SphereOverlapActors
+		DrawDebugSphere(GetWorld(), ExplosionLocation, radius, 12, FColor::Red, true, 10.0f);
+		
+		for (AActor* overlappedActor : outActors) 
+		{
+			ALunarticMonster* Monster = Cast<ALunarticMonster>(overlappedActor);
+
+			Monster->OnTakeDamage(100);
+
+			Monster->MeshComp->AddRadialImpulse(ExplosionLocation, radius, 2000.0f, ERadialImpulseFalloff::RIF_Linear, true);
+			Monster->MeshComp->AddRadialForce(ExplosionLocation, radius, 2000.0f, ERadialImpulseFalloff::RIF_Linear, true);
+			//UE_LOG(LogTemp, Log, TEXT("OverlappedActor: %s"), *overlappedActor->GetName());
+		}
+	}
+	else
+	{
+		isFire = true;
+	}
 }
 
 void ALunarticPlayerController::EndShoot()
 {
 	isFire = false;
+}
+
+void ALunarticPlayerController::Bomb()
+{
+	ALunarticCharacter* MyCharacter = Cast<ALunarticCharacter>(GetCharacter());
+	if (SpecialWeaponFlag == false)
+	{
+		SpecialWeaponFlag = true;
+		MyCharacter->GetCursorToWorld()->SetWorldScale3D(FVector(10, 10, 10));
+	}
+	else
+	{
+		SpecialWeaponFlag = false;
+		MyCharacter->GetCursorToWorld()->SetWorldScale3D(FVector(1, 1, 1));
+	}
 }
 
 void ALunarticPlayerController::UpDown(float NewAxisValue)

@@ -27,7 +27,6 @@ ALunarticMonster::ALunarticMonster()
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> MESH(TEXT("'/Game/Mannequin/Character/Mesh/SK_Mannequin.SK_Mannequin'"));
 	if (MESH.Succeeded())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Mesh Loaded"));
 		MeshComp->SetSkeletalMesh(MESH.Object);
 	}
 	MeshComp->SetAnimationMode(EAnimationMode::AnimationBlueprint);
@@ -35,7 +34,6 @@ ALunarticMonster::ALunarticMonster()
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM(TEXT("'/Game/Mannequin/Animations/ThirdPerson_AnimBP.ThirdPerson_AnimBP_C'"));
 	if (ANIM.Succeeded())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("AnimBP implemented"));
 		MeshComp->SetAnimInstanceClass(ANIM.Class);
 	}
 	GetCharacterMovement()->bOrientRotationToMovement = true;
@@ -52,23 +50,15 @@ void ALunarticMonster::BeginPlay()
 	Super::BeginPlay();
 
 	Tags.Add("Enemy");
-	
-	
 }
 
 void ALunarticMonster::OnTakeDamage(int Damage)
 {
 	HP -= Damage;
 	UE_LOG(LogTemp, Warning, TEXT("Current HP: %d"), HP);
-	if (HP < 0)
+	if (HP <= 0)
 	{
 		this->Destroy();
 	}
 }
 
-// Called every frame
-void ALunarticMonster::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
