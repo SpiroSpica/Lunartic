@@ -12,6 +12,7 @@ ALunarticPlayerController::ALunarticPlayerController()
 	notShooting = true;
 	SpecialWeaponFlag = false;
 	DefaultMouseCursor = EMouseCursor::Crosshairs;
+	WeaponType = 1;
 
 }
 
@@ -21,8 +22,18 @@ void ALunarticPlayerController::PlayerTick(float DeltaTime)
 
 	if (isFire && notShooting && !SpecialWeaponFlag)
 	{
-		Shoot();
-		//HitScan();
+		switch (WeaponType)
+		{
+		case 1:
+			Shoot();
+			break;
+		case 2:
+			HitScan();
+			break;
+		case 3:
+			ShootExplosive();
+			break;
+		}
 	}
 }
 
@@ -38,10 +49,17 @@ void ALunarticPlayerController::SetupInputComponent()
 	// set up gameplay key bindings
 	Super::SetupInputComponent();
 
-	
 	InputComponent->BindAction("LeftClick", IE_Pressed, this, &ALunarticPlayerController::StartShoot);
 	InputComponent->BindAction("LeftClick", IE_Released, this, &ALunarticPlayerController::EndShoot);
 	InputComponent->BindAction("SpecialWeapon", IE_Pressed, this, &ALunarticPlayerController::Bomb);
+	
+	DECLARE_DELEGATE_OneParam(FCustomIntDelegate, const int);
+	
+	//change weapon type
+	InputComponent->BindAction<FCustomIntDelegate>("WeaponChange1", IE_Pressed, this, &ALunarticPlayerController::WeaponChange, 1);
+	InputComponent->BindAction<FCustomIntDelegate>("WeaponChange2", IE_Pressed, this, &ALunarticPlayerController::WeaponChange, 2);
+	InputComponent->BindAction<FCustomIntDelegate>("WeaponChange3", IE_Pressed, this, &ALunarticPlayerController::WeaponChange, 3);
+
 	
 	InputComponent->BindAxis(TEXT("MoveForWard"), this, &ALunarticPlayerController::UpDown);
 	InputComponent->BindAxis(TEXT("MoveRight"), this, &ALunarticPlayerController::LeftRight);
@@ -114,6 +132,11 @@ void ALunarticPlayerController::Bomb()
 		SpecialWeaponFlag = false;
 		MyCharacter->GetCursorToWorld()->SetWorldScale3D(FVector(1, 1, 1));
 	}
+}
+
+void ALunarticPlayerController::WeaponChange(int type)
+{
+	WeaponType = type;
 }
 
 void ALunarticPlayerController::UpDown(float NewAxisValue)
@@ -190,6 +213,32 @@ void ALunarticPlayerController::Shoot()
 		SpawnParams.Owner = MyCharacter;
 		SpawnParams.Instigator = MyCharacter->GetInstigator();
 		AAProjectile* Projectile = World->SpawnActor<AAProjectile>(MuzzleLocation, MuzzleRotation, SpawnParams);
+		if (Projectile)
+		{
+			FVector LaunchDirection = MuzzleRotation.Vector();
+			Projectile->FireInDirection(LaunchDirection);
+		}
+	}
+}
+
+void ALunarticPlayerController::ShootExplosive()
+{
+	notShooting = false;
+
+	ACharacter* const MyCharacter = GetCharacter();
+
+	MuzzleOffset = MyCharacter->GetActorRotation().Vector() * 30;
+
+	FVector MuzzleLocation = MyCharacter->GetActorLocation() + MuzzleOffset;
+	FRotator MuzzleRotation = MyCharacter->GetActorRotation();
+
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = MyCharacter;
+		SpawnParams.Instigator = MyCharacter->GetInstigator();
+		AExplosiveProjectile* Projectile = World->SpawnActor<AExplosiveProjectile>(MuzzleLocation, MuzzleRotation, SpawnParams);
 		if (Projectile)
 		{
 			FVector LaunchDirection = MuzzleRotation.Vector();

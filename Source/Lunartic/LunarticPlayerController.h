@@ -5,10 +5,12 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "AProjectile.h"
+#include "ExplosiveProjectile.h"
 #include "LunarticMonster.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "DrawDebugHelpers.h"
 #include "LunarticPlayerController.generated.h"
+
 
 UCLASS()
 class ALunarticPlayerController : public APlayerController
@@ -35,8 +37,6 @@ protected:
 	UPROPERTY()
 	bool notShooting;
 
-
-
 	
 
 public:
@@ -50,13 +50,19 @@ public:
 	void Shoot();
 
 	UFUNCTION()
-	void HitScan();
+	void ShootExplosive();
 	
+	UFUNCTION()
+	void HitScan();
+		
 	UFUNCTION()
 	void StartShoot();
 
 	UFUNCTION()
 	void EndShoot();
+
+	UFUNCTION()
+	void WeaponChange(int num);
 
 	UFUNCTION()
 	void AttackLimit();
@@ -73,6 +79,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Timer)
 	FTimerHandle MemberTimerHandle;
 
+	UPROPERTY(VisibleAnyWhere)
+	int WeaponType;
 };
 
 
