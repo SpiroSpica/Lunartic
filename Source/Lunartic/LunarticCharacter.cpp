@@ -57,10 +57,6 @@ ALunarticCharacter::ALunarticCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
 
-
-
-	AIControllerClass = ALunarticMonsterController::StaticClass();
-	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
 void ALunarticCharacter::Tick(float DeltaSeconds)

@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "AProjectile.h"
-#include "ExplosiveProjectile.h"
+#include "Explosive.h"
 #include "LunarticMonster.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "DrawDebugHelpers.h"
@@ -37,7 +37,8 @@ protected:
 	UPROPERTY()
 	bool notShooting;
 
-	
+	UPROPERTY()
+	float ShootCooltime;
 
 public:
 
