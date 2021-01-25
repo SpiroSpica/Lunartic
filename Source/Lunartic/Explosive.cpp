@@ -20,28 +20,15 @@ AExplosive::AExplosive()
 		CollisionComponent->InitSphereRadius(15.0f);
 		CollisionComponent->SetCollisionProfileName(TEXT("Bullet"));
 		CollisionComponent->SetSimulatePhysics(true);
-
+		CollisionComponent->SetNotifyRigidBodyCollision(true);
 		RootComponent = CollisionComponent;
 	}
 
-	/*
-	if (!ProjectileMovementComponent)
-	{
-		ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
-		ProjectileMovementComponent->SetUpdatedComponent(CollisionComponent);
-		ProjectileMovementComponent->InitialSpeed = 1500.0f;
-		ProjectileMovementComponent->MaxSpeed = 3000.0f;
-		ProjectileMovementComponent->bRotationFollowsVelocity = true;
-		ProjectileMovementComponent->bShouldBounce = true;
-		ProjectileMovementComponent->Bounciness = 0.3f;
-		ProjectileMovementComponent->ProjectileGravityScale = 0.5f;
-	}
-	*/
 	if (!ProjectileMeshComponent)
 	{
 		ProjectileMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ProjectileMeshComponent"));
-		ProjectileMeshComponent->SetCollisionProfileName(TEXT("Bullet"));
-
+		//ProjectileMeshComponent->SetCollisionProfileName(TEXT("Bullet"));
+		
 		static ConstructorHelpers::FObjectFinder<UStaticMesh>Mesh(TEXT("'/Game/Resources/Sphere.Sphere'"));
 
 		if (Mesh.Succeeded())
@@ -62,6 +49,8 @@ AExplosive::AExplosive()
 
 
 	CollisionComponent->OnComponentHit.AddDynamic(this, &AExplosive::OnHit);
+
+	
 
 }
 

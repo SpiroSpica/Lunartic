@@ -15,6 +15,25 @@ ALunarticPlayerController::ALunarticPlayerController()
 	WeaponType = 1;
 	ShootCooltime = 1.0f;
 
+	Weapon[0].ShootInterval = 0.1;
+	Weapon[0].ReloadInterval = 2;
+	Weapon[0].MaxAmmo = 40;
+	Weapon[0].Damage = 10;
+
+	Weapon[1].ShootInterval = 0.03;
+	Weapon[1].ReloadInterval = 5;
+	Weapon[1].MaxAmmo = 200;
+	Weapon[1].Damage = 5;
+
+	Weapon[2].ShootInterval = 1;
+	Weapon[2].ReloadInterval = 3;
+	Weapon[2].MaxAmmo = 3;
+	Weapon[2].Damage = 70;
+	
+
+
+	ShootReload = { 0.2f, 0.2f, 1.0f };
+
 }
 
 void ALunarticPlayerController::PlayerTick(float DeltaTime)
@@ -27,12 +46,15 @@ void ALunarticPlayerController::PlayerTick(float DeltaTime)
 		{
 		case 1:
 			Shoot();
+			GetWorldTimerManager().SetTimer(MemberTimerHandle, this, &ALunarticPlayerController::AttackLimit, ShootCooltime, false, ShootReload[0]);
 			break;
 		case 2:
 			HitScan();
+			GetWorldTimerManager().SetTimer(MemberTimerHandle, this, &ALunarticPlayerController::AttackLimit, ShootCooltime, false, ShootReload[1]);
 			break;
 		case 3:
 			ShootExplosive();
+			GetWorldTimerManager().SetTimer(MemberTimerHandle, this, &ALunarticPlayerController::AttackLimit, ShootCooltime, false, ShootReload[2]);
 			break;
 		}
 	}
@@ -236,24 +258,19 @@ void ALunarticPlayerController::ShootExplosive()
 	{
 		FVector startLoc = MyCharacter->GetActorLocation();      // 발사 지점
 		FVector targetLoc = MyCharacter->GetCursorToWorld()->GetComponentLocation();;  // 타겟 지점.
-		float arcValue = 0.5f;                       // ArcParam (0.0-1.0)
+		float arcValue = 0.4f;                       // ArcParam (0.0-1.0)
 		FVector outVelocity = FVector::ZeroVector;   // 결과 Velocity
 		if (UGameplayStatics::SuggestProjectileVelocity_CustomArc(this, outVelocity, startLoc, targetLoc, GetWorld()->GetGravityZ(), arcValue))
 		{
-			FPredictProjectilePathParams predictParams(20.0f, startLoc, outVelocity, 15.0f);   // 20: tracing 보여질 프로젝타일 크기, 15: 시물레이션되는 Max 시간(초)
-			predictParams.DrawDebugTime = 15.0f;     //디버그 라인 보여지는 시간 (초)
-			predictParams.DrawDebugType = EDrawDebugTrace::Type::ForDuration;  // DrawDebugTime 을 지정하면 EDrawDebugTrace::Type::ForDuration 필요.
-			predictParams.OverrideGravityZ = GetWorld()->GetGravityZ();
-			FPredictProjectilePathResult result;
-			UGameplayStatics::PredictProjectilePath(this, predictParams, result);
-
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.Owner = MyCharacter;
 			SpawnParams.Instigator = MyCharacter->GetInstigator();
 			AExplosive* Projectile = World->SpawnActor<AExplosive>(MuzzleLocation, MuzzleRotation, SpawnParams);
 
-			Projectile->CollisionComponent->AddImpulse(outVelocity);
-				
+			UE_LOG(LogTemp, Warning, TEXT("%f %f %f"), outVelocity.X, outVelocity.Y, outVelocity.Z);
+
+			Projectile->ProjectileMeshComponent->SetLinearDamping(0);
+			Projectile->ProjectileMeshComponent->AddImpulse(outVelocity * 14.7);
 		}
 		/*
 
