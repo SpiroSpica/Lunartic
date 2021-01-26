@@ -13,6 +13,15 @@ class ALunarticGameMode : public AGameModeBase
 
 public:
 	ALunarticGameMode();
+
+	UFUNCTION()
+	void StageClear();
+
+	UFUNCTION()
+	bool isStageCleared();
+
+	UPROPERTY(VisibleAnywhere)
+	bool ClearFlag;
 };
 
 

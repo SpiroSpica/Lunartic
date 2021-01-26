@@ -58,9 +58,7 @@ ALunarticCharacter::ALunarticCharacter()
 	PrimaryActorTick.bStartWithTickEnabled = true;
 
 
-
-	AIControllerClass = ALunarticMonsterController::StaticClass();
-	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+	EnemyCount = 30;
 }
 
 void ALunarticCharacter::Tick(float DeltaSeconds)
@@ -84,6 +82,17 @@ void ALunarticCharacter::Tick(float DeltaSeconds)
 			
 			SetActorRotation(Rot);
 		}
+	}
+}
+
+void ALunarticCharacter::OnEnemyKill()
+{
+	EnemyCount--;
+	
+	if (EnemyCount <= 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("cleared"));
+		GetWorld()->GetAuthGameMode<ALunarticGameMode>()->StageClear();
 	}
 }
 

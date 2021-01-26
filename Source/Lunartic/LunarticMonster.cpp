@@ -9,7 +9,7 @@ ALunarticMonster::ALunarticMonster()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	ACharacter* const MyCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	MyCharacter = Cast<ALunarticCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 	
 	Capsule = GetCapsuleComponent();
 	
@@ -55,9 +55,9 @@ void ALunarticMonster::BeginPlay()
 void ALunarticMonster::OnTakeDamage(int Damage)
 {
 	HP -= Damage;
-	UE_LOG(LogTemp, Warning, TEXT("Current HP: %d"), HP);
 	if (HP <= 0)
 	{
+		MyCharacter->OnEnemyKill();
 		this->Destroy();
 	}
 }

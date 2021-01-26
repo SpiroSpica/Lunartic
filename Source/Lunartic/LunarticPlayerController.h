@@ -5,10 +5,43 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "AProjectile.h"
+#include "Explosive.h"
 #include "LunarticMonster.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "DrawDebugHelpers.h"
 #include "LunarticPlayerController.generated.h"
+
+
+UENUM(BlueprintType)
+enum class WeaponType : uint8
+{
+	Projectile = 0 UMETA(DisplayName = "Projectile"),
+	HitScan UMETA(DisplayName = "HitScan"),
+};
+
+
+USTRUCT(Atomic, BlueprintType)
+struct FWeaponStatus
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Damage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float ShootInterval;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 MaxAmmo;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float ReloadInterval;
+
+	uint8 WeaponStyle;
+};
+
+
 
 UCLASS()
 class ALunarticPlayerController : public APlayerController
@@ -35,9 +68,14 @@ protected:
 	UPROPERTY()
 	bool notShooting;
 
+	UPROPERTY()
+	TArray<float> ShootReload;	
 
+	UPROPERTY()
+	TArray<FWeaponStatus> Weapon;
 
-	
+	UPROPERTY()
+	float ShootCooltime;
 
 public:
 
@@ -50,13 +88,19 @@ public:
 	void Shoot();
 
 	UFUNCTION()
-	void HitScan();
+	void ShootExplosive();
 	
+	UFUNCTION()
+	void HitScan();
+		
 	UFUNCTION()
 	void StartShoot();
 
 	UFUNCTION()
 	void EndShoot();
+
+	UFUNCTION()
+	void WeaponChange(int num);
 
 	UFUNCTION()
 	void AttackLimit();
@@ -73,6 +117,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Timer)
 	FTimerHandle MemberTimerHandle;
 
+	UPROPERTY(VisibleAnyWhere)
+	int WeaponType;
 };
-
 

@@ -92,7 +92,7 @@ void AAProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, 
 	{
 		
 		ALunarticMonster* Target = Cast<ALunarticMonster>(Hit.GetActor());
-		Target->OnTakeDamage(20);
+		Target->OnTakeDamage(Damage);
 		
 		
 	}

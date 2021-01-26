@@ -14,6 +14,7 @@ AMonsterSpawner::AMonsterSpawner()
 	SpawnPoint = CreateDefaultSubobject<UParticleSystemComponent>("SpawnPoint");
 
 	SpawnInterval = 1;
+	isGameRunning = true;
 
 	auto MeshAsset = ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'"));
 	if (MeshAsset.Object != nullptr)
@@ -53,20 +54,39 @@ void AMonsterSpawner::BeginPlay()
 void AMonsterSpawner::SpawnUnit()
 {
 	FVector SpawnLocation = SpawnPoint->GetComponentLocation();
-	GetWorld()->SpawnActor(UnitToSpawn, &SpawnLocation);
+	ALunarticMonster* tmp = Cast<ALunarticMonster>(GetWorld()->SpawnActor(UnitToSpawn, &SpawnLocation));
+	UnitSave.Emplace(tmp);
 }
 
 
 void AMonsterSpawner::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
-	GetWorld()->GetTimerManager().ClearTimer(SpawnTimerHandle);
 }
 
 // Called every frame
 void AMonsterSpawner::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
+	if (isGameRunning && GetWorld()->GetAuthGameMode<ALunarticGameMode>()->isStageCleared())
+	{
+		isGameRunning = false;
+		StageClear();
+	}
+
+}
+
+void AMonsterSpawner::StageClear()
+{
+	for (int i = 0; i < UnitSave.Num(); i++)
+	{
+		if (UnitSave[i] != nullptr)
+		{
+			UnitSave[i]->Destroy();
+		}
+	}
+	GetWorld()->GetTimerManager().ClearTimer(SpawnTimerHandle);
 
 }
 
