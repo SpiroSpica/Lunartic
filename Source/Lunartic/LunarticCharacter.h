@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "LunarticGameMode.h"
 #include "LunarticCharacter.generated.h"
 
 UCLASS(Blueprintable)
@@ -24,6 +25,11 @@ public:
 	/** Returns CursorToWorld subobject **/
 	FORCEINLINE class UDecalComponent* GetCursorToWorld() { return CursorToWorld; }
 
+	UPROPERTY()
+	int EnemyCount;
+
+	UFUNCTION()
+	void OnEnemyKill();
 
 private:
 	/** Top down camera */

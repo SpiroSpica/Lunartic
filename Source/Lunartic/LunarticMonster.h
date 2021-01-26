@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Character.h"
+#include "LunarticCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/CapsuleComponent.h"
 #include "LunarticMonster.generated.h"
@@ -27,6 +28,8 @@ protected:
 
 public:	
 	
+	UPROPERTY(VisibleAnyWhere)
+	ALunarticCharacter* MyCharacter;
 
 	UPROPERTY(EditAnyWhere, Category = Visual)
 	USkeletalMeshComponent* MeshComp;

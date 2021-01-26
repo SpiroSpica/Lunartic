@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "LunarticMonster.h"
+#include "LunarticGameMode.h"
 #include "MonsterSpawner.generated.h"
 
 UCLASS()
@@ -24,10 +25,19 @@ public:
 	UParticleSystemComponent* SpawnPoint;
 
 	UPROPERTY()
+	TArray<ALunarticMonster*> UnitSave;
+
+	UPROPERTY()
 	UClass* UnitToSpawn;
 
 	UPROPERTY()
 	float SpawnInterval;
+
+	UPROPERTY()
+	FTimerHandle SpawnTimerHandle;
+
+	UPROPERTY()
+	bool isGameRunning;
 
 	UFUNCTION()
 	void SpawnUnit();
@@ -35,8 +45,8 @@ public:
 	UFUNCTION()
 	void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-	UPROPERTY()
-	FTimerHandle SpawnTimerHandle;
+	UFUNCTION()
+	void StageClear();
 
 protected:
 	// Called when the game starts or when spawned

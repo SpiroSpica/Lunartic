@@ -108,9 +108,8 @@ void AExplosive::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UP
 	{
 		ALunarticMonster* Monster = Cast<ALunarticMonster>(overlappedActor);
 
-		Monster->OnTakeDamage(10);
+		Monster->OnTakeDamage(Damage);
 		Monster->GetCharacterMovement()->AddRadialImpulse(ExplosionLocation, radius, 2000.0f, ERadialImpulseFalloff::RIF_Constant, true);
-		//UE_LOG(LogTemp, Log, TEXT("OverlappedActor: %s"), *overlappedActor->GetName());
 	}
 	SetLifeSpan(0.01f);
 
