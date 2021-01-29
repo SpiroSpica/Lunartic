@@ -10,7 +10,7 @@ ALunarticMonster::ALunarticMonster()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	MyCharacter = Cast<ALunarticCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-	
+	/*
 	Capsule = GetCapsuleComponent();
 	
 	MeshComp = GetMesh();
@@ -42,6 +42,7 @@ ALunarticMonster::ALunarticMonster()
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
 	HP = 200;
+	*/
 }
 
 // Called when the game starts or when spawned

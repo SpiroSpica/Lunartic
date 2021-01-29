@@ -19,6 +19,7 @@ AEnemy_Cannon::AEnemy_Cannon()
 	Legs = GetMesh();
 	Base = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Base"));
 	Cannon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Cannon"));
+	Explosion = CreateDefaultSubobject<UNiagaraSystem>(TEXT("Boom"));
 
 	RootComponent = Capsule;
 
@@ -45,7 +46,14 @@ AEnemy_Cannon::AEnemy_Cannon()
 	Base->AttachToComponent(Legs, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), ParentSocket);
 	Cannon->AttachToComponent(Base, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), ParentSocket);
 
-
+	/*
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> BOOM(TEXT("NiagaraSystem'/Game/VFX/FX/Cannon/NS_cannon_flash.NS_cannon_flash'"));
+	if (BOOM.Succeeded())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Niagara Found"));
+		Explosion = BOOM.Object;
+	}
+	*/
 	Legs->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM(TEXT("'/Game/Model/Heavy_cannon/Cannon_AnimBP.Cannon_AnimBP_C'"));
 	if (ANIM.Succeeded())
@@ -60,13 +68,16 @@ AEnemy_Cannon::AEnemy_Cannon()
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
 	HP = 200;
+	OnAttack = false;
+
+	
 }
 
 // Called when the game starts or when spawned
 void AEnemy_Cannon::BeginPlay()
 {
 	Super::BeginPlay();
-	Tags.Add("Enemy");
+	//Tags.Add("Enemy");
 }
 
 // Called every frame
@@ -74,9 +85,11 @@ void AEnemy_Cannon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	FRotator tmp = UKismetMathLibrary::FindLookAtRotation(Cannon->GetComponentLocation(), TargetCharacter->GetActorLocation());
-	
-	Base->SetWorldRotation(FQuat(tmp));
+	if (!OnAttack)
+	{
+		FRotator tmp = UKismetMathLibrary::FindLookAtRotation(Cannon->GetComponentLocation(), TargetCharacter->GetActorLocation());
+		Base->SetWorldRotation(FMath::Lerp(FQuat(Base->GetComponentRotation()),FQuat(tmp), 0.05f));
+	}
 }
 
 void AEnemy_Cannon::Attack()
@@ -84,6 +97,7 @@ void AEnemy_Cannon::Attack()
 	UE_LOG(LogTemp, Warning, TEXT("Attacking"));
 
 	FirePlace = TargetCharacter->GetActorLocation();
+	OnAttack = true;
 	GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &AEnemy_Cannon::Fire, 2.0f, false);
 
 	
@@ -91,7 +105,19 @@ void AEnemy_Cannon::Attack()
 
 void AEnemy_Cannon::Fire()
 {
-	//UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), SpawnEffect, MeshComp->GetComponentLocation(), MeshComp->GetComponentRotation());
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), Explosion, FirePlace, FRotator::ZeroRotator);
 	UE_LOG(LogTemp, Warning, TEXT("Attacked"));
 	OnAttackEnd.Broadcast();
+	OnAttack = false;
+}
+
+bool AEnemy_Cannon::AttackAvailable()
+{
+	FRotator tmp = UKismetMathLibrary::FindLookAtRotation(Cannon->GetComponentLocation(), TargetCharacter->GetActorLocation());
+	if (Base->GetComponentRotation().Equals(tmp, 10))
+	{
+		return true;
+	}
+	
+	return false;
 }

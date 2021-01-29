@@ -22,13 +22,17 @@ EBTNodeResult::Type UCannonAttack::ExecuteTask(UBehaviorTreeComponent& OwnerComp
 		EBTNodeResult::Failed;
 	}
 
-	IsAttacking = true;
-	Chara->Attack();
+	if (Chara->AttackAvailable())
+	{
+		IsAttacking = true;
+		Chara->Attack();
 
-	Chara->OnAttackEnd.AddLambda([this]()->void {
-		IsAttacking = false;
-		});
-
+		Chara->OnAttackEnd.AddLambda([this]()->void {
+			IsAttacking = false;
+			});
+		return EBTNodeResult::InProgress;
+	}
+	
 	return EBTNodeResult::InProgress;
 }
 

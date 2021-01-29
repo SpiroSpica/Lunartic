@@ -10,13 +10,15 @@
 #include "LunarticMonster.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Components/CapsuleComponent.h"
 #include "Enemy_Cannon.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnAttackEndDelegate);
 
 UCLASS(Blueprintable)
-class LUNARTIC_API AEnemy_Cannon : public ACharacter
+class LUNARTIC_API AEnemy_Cannon : public ALunarticMonster
 {
 	GENERATED_BODY()
 
@@ -42,11 +44,12 @@ public:
 	UPROPERTY(EditAnywhere, Category = Visual)
 	USkeletalMeshComponent* Legs;
 
-	UPROPERTY(VisibleAnywhere, Category = Collision)
-	UCapsuleComponent* Capsule;
+	UPROPERTY(EditAnywhere, Category = Visual)
+	UNiagaraSystem* Explosion;
+
+	UPROPERTY(VisibleAnywhere)
+	bool OnAttack;
 	
-	UPROPERTY(VIsibleANywhere)
-	int HP;
 
 	FOnAttackEndDelegate OnAttackEnd;
 
@@ -58,6 +61,9 @@ public:
 
 	UFUNCTION()
 	void Attack();
+
+	UFUNCTION()
+	bool AttackAvailable();
 
 	UFUNCTION()
 	void Fire();
