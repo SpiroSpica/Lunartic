@@ -37,6 +37,9 @@ public:
 	UFUNCTION()
 	void OnTakeDamage(int Damage);
 
+	UPROPERTY()
+	UStaticMeshComponent* Outfit;
+
 
 private:
 	/** Top down camera */

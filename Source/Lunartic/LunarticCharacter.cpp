@@ -42,6 +42,9 @@ ALunarticCharacter::ALunarticCharacter()
 	TopDownCameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	TopDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
+	Outfit = CreateDefaultSubobject<UStaticMeshComponent>("Appearance");
+	Outfit->SetupAttachment(RootComponent);
+
 	// Create a decal in the world to show the cursor's location
 	CursorToWorld = CreateDefaultSubobject<UDecalComponent>("CursorToWorld");
 	CursorToWorld->SetupAttachment(RootComponent);
