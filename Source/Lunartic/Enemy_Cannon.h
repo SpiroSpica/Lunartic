@@ -47,6 +47,10 @@ public:
 	UPROPERTY(EditAnywhere, Category = Visual)
 	UNiagaraSystem* Explosion;
 
+	UPROPERTY(EditAnywhere, Category = Visual)
+	UNiagaraSystem* Flash;
+
+
 	UPROPERTY(VisibleAnywhere)
 	bool OnAttack;
 	

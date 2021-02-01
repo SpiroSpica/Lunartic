@@ -20,6 +20,7 @@ AEnemy_Cannon::AEnemy_Cannon()
 	Base = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Base"));
 	Cannon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Cannon"));
 	Explosion = CreateDefaultSubobject<UNiagaraSystem>(TEXT("Boom"));
+	Flash = CreateDefaultSubobject<UNiagaraSystem>(TEXT("Flash"));
 
 	RootComponent = Capsule;
 
@@ -46,14 +47,7 @@ AEnemy_Cannon::AEnemy_Cannon()
 	Base->AttachToComponent(Legs, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), ParentSocket);
 	Cannon->AttachToComponent(Base, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), ParentSocket);
 
-	/*
-	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> BOOM(TEXT("NiagaraSystem'/Game/VFX/FX/Cannon/NS_cannon_flash.NS_cannon_flash'"));
-	if (BOOM.Succeeded())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Niagara Found"));
-		Explosion = BOOM.Object;
-	}
-	*/
+
 	Legs->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM(TEXT("'/Game/Model/Heavy_cannon/Cannon_AnimBP.Cannon_AnimBP_C'"));
 	if (ANIM.Succeeded())
@@ -106,7 +100,43 @@ void AEnemy_Cannon::Attack()
 void AEnemy_Cannon::Fire()
 {
 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), Explosion, FirePlace, FRotator::ZeroRotator);
-	UE_LOG(LogTemp, Warning, TEXT("Attacked"));
+	UNiagaraFunctionLibrary::SpawnSystemAttached(Flash, Cannon, FName("root"), FVector(0, 0, 270), FRotator::ZeroRotator, EAttachLocation::KeepRelativeOffset, false, true);
+	UE_LOG(LogTemp, Warning, TEXT("Attacked2"));
+
+	UKismetSystemLibrary::FlushPersistentDebugLines(GetWorld());
+	
+	FVector ExplosionLocation = FirePlace;
+
+	// Set what actors to seek out from it's collision channel
+	TArray<TEnumAsByte<EObjectTypeQuery>> traceObjectTypes;
+	traceObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
+
+	// Ignore any specific actors
+	TArray<AActor*> ignoreActors;
+	// Ignore self or remove this line to not ignore any
+	ignoreActors.Init(this, 1);
+
+	// Array of actors that are inside the radius of the sphere
+	TArray<AActor*> outActors;
+
+	// Total radius of the sphere
+	float radius = 300.0f;
+
+	// Class that the sphere should hit against and include in the outActors array (Can be null)
+	UClass* seekClass = ALunarticCharacter::StaticClass(); // NULL;
+	UKismetSystemLibrary::SphereOverlapActors(GetWorld(), ExplosionLocation, radius, traceObjectTypes, seekClass, ignoreActors, outActors);
+
+	UE_LOG(LogTemp, Warning, TEXT("Number found: %d"), outActors.Num());
+
+	for (AActor* overlappedActor : outActors)
+	{
+		ALunarticCharacter* Player = Cast<ALunarticCharacter>(overlappedActor);
+		Player->GetCharacterMovement()->AddRadialImpulse(ExplosionLocation, radius, 2000.0f, ERadialImpulseFalloff::RIF_Linear, true);
+		Player->OnTakeDamage(100);
+	}
+
+
+
 	OnAttackEnd.Broadcast();
 	OnAttack = false;
 }

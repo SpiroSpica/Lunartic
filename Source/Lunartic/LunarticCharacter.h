@@ -28,8 +28,15 @@ public:
 	UPROPERTY()
 	int EnemyCount;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	int HP;
+	
 	UFUNCTION()
 	void OnEnemyKill();
+
+	UFUNCTION()
+	void OnTakeDamage(int Damage);
+
 
 private:
 	/** Top down camera */
@@ -43,6 +50,7 @@ private:
 	/** A decal that projects to the cursor location. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UDecalComponent* CursorToWorld;
-
+	
+	
 };
 
