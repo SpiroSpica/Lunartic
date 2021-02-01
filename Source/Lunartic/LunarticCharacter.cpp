@@ -59,6 +59,7 @@ ALunarticCharacter::ALunarticCharacter()
 
 
 	EnemyCount = 30;
+	HP = 200;
 }
 
 void ALunarticCharacter::Tick(float DeltaSeconds)
@@ -96,4 +97,14 @@ void ALunarticCharacter::OnEnemyKill()
 	}
 }
 
+void ALunarticCharacter::OnTakeDamage(int Damage)
+{
+	HP -= Damage;
+
+	UE_LOG(LogTemp, Warning, TEXT("CurrentHP: :%d"), HP);
+	if (HP <= 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("GameOver"));
+	}
+}
 

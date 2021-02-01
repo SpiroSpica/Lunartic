@@ -31,7 +31,7 @@ AMonsterSpawner::AMonsterSpawner()
 
 	SpawnPoint->SetRelativeScale3D(FVector(0.5, 0.5, 0.5));
 
-	static ConstructorHelpers::FObjectFinder<UBlueprint> Unit(TEXT("'/Game/Trial.Trial'"));
+	static ConstructorHelpers::FObjectFinder<UBlueprint> Unit(TEXT("'/Game/Enemy/Enemy_Cannon.Enemy_Cannon'"));
 	if (Unit.Object != nullptr)
 	{
 		UnitToSpawn = (UClass*)Unit.Object->GeneratedClass;
@@ -46,6 +46,7 @@ void AMonsterSpawner::BeginPlay()
 	RootComponent = BuildingMesh;
 	SpawnPoint->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	SpawnPoint->SetRelativeLocation(FVector(150, 0, 0));
+
 	GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &AMonsterSpawner::SpawnUnit, SpawnInterval, true);
 
 	
