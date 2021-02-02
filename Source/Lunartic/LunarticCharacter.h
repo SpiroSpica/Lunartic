@@ -5,7 +5,12 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "LunarticGameMode.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
+#include "NiagaraSystemInstance.h"
 #include "LunarticCharacter.generated.h"
+
 
 UCLASS(Blueprintable)
 class ALunarticCharacter : public ACharacter
@@ -17,6 +22,8 @@ public:
 
 	// Called every frame.
 	virtual void Tick(float DeltaSeconds) override;
+	
+	virtual void BeginPlay() override;
 
 	/** Returns TopDownCameraComponent subobject **/
 	FORCEINLINE class UCameraComponent* GetTopDownCameraComponent() const { return TopDownCameraComponent; }
@@ -37,9 +44,32 @@ public:
 	UFUNCTION()
 	void OnTakeDamage(int Damage);
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UStaticMeshComponent* Outfit;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UNiagaraComponent* HoverFL;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UNiagaraComponent* HoverFR;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UNiagaraComponent* HoverBL;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UNiagaraComponent* HoverBR;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UNiagaraComponent* Shoot;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UNiagaraComponent* HoverSmoke;
+
+	UPROPERTY()
+	float PastRotationYaw;
+
+	UFUNCTION()
+	void FireEffect(bool firing);
 
 private:
 	/** Top down camera */

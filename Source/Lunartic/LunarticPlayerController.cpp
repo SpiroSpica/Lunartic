@@ -55,9 +55,11 @@ void ALunarticPlayerController::PlayerTick(float DeltaTime)
 		{
 		case 1:
 			Shoot();
+			MyCharacter->FireEffect(true);
 			break;
 		case 2:
 			HitScan();
+			MyCharacter->FireEffect(true);
 			break;
 		case 3:
 			ShootExplosive();
@@ -70,6 +72,7 @@ void ALunarticPlayerController::PlayerTick(float DeltaTime)
 void ALunarticPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+	MyCharacter = Cast<ALunarticCharacter>(GetCharacter());
 }
 
 void ALunarticPlayerController::SetupInputComponent()
@@ -99,7 +102,6 @@ void ALunarticPlayerController::StartShoot()
 	if (SpecialWeaponFlag)
 	{
 		UKismetSystemLibrary::FlushPersistentDebugLines(GetWorld());
-		ALunarticCharacter* MyCharacter = Cast<ALunarticCharacter>(GetCharacter());
 		
 		FVector ExplosionLocation = MyCharacter->GetCursorToWorld()->GetComponentLocation();
 
@@ -142,12 +144,12 @@ void ALunarticPlayerController::StartShoot()
 
 void ALunarticPlayerController::EndShoot()
 {
+	MyCharacter->FireEffect(false);
 	isFire = false;
 }
 
 void ALunarticPlayerController::Bomb()
 {
-	ALunarticCharacter* MyCharacter = Cast<ALunarticCharacter>(GetCharacter());
 	if (SpecialWeaponFlag == false)
 	{
 		SpecialWeaponFlag = true;
@@ -167,7 +169,6 @@ void ALunarticPlayerController::WeaponChange(int type)
 
 void ALunarticPlayerController::UpDown(float NewAxisValue)
 {
-	ACharacter* const MyCharacter = GetCharacter();
 	if (MyCharacter && NewAxisValue != 0.0f)
 	{
 		FRotator rot = GetControlRotation();
@@ -179,7 +180,6 @@ void ALunarticPlayerController::UpDown(float NewAxisValue)
 
 void ALunarticPlayerController::LeftRight(float NewAxisValue)
 {
-	ACharacter* const MyCharacter = GetCharacter();
 	if (MyCharacter && NewAxisValue != 0.0f)
 	{
 		FRotator rot = GetControlRotation();
@@ -193,7 +193,10 @@ void ALunarticPlayerController::HitScan()
 {
 	notShooting = false;
 	FHitResult target;
-	ACharacter* const MyCharacter = GetCharacter();
+
+	FName TraceLine("HitScanTrace");
+
+	GetWorld()->DebugDrawTraceTag = TraceLine;
 
 	FVector start = MyCharacter->GetActorLocation();
 	FVector end = start + MyCharacter->GetActorRotation().Vector() * 10000.0f;
@@ -202,6 +205,7 @@ void ALunarticPlayerController::HitScan()
 	collisionParams.bDebugQuery = true;
 	collisionParams.bIgnoreBlocks = false;
 	collisionParams.AddIgnoredActor(MyCharacter);
+	collisionParams.TraceTag = TraceLine;
 	
 	if (MyCharacter->GetWorld()->LineTraceSingleByChannel(target, start, end, ECC_WorldStatic, collisionParams))
 	{
@@ -225,10 +229,8 @@ void ALunarticPlayerController::Shoot()
 {
 	notShooting = false;
 	
-	ACharacter* const MyCharacter = GetCharacter();
+	MuzzleOffset = MyCharacter->GetActorRotation().Vector() * 120 + FVector(0,0,85);
 	
-	MuzzleOffset = MyCharacter->GetActorRotation().Vector() * 30;
-
 	FVector MuzzleLocation = MyCharacter->GetActorLocation() + MuzzleOffset;
 	FRotator MuzzleRotation = MyCharacter->GetActorRotation();
 
@@ -246,15 +248,14 @@ void ALunarticPlayerController::Shoot()
 			Projectile->Damage = Weapon[WeaponType].Damage;
 		}
 	}
+	
 }
 
 void ALunarticPlayerController::ShootExplosive()
 {
 	notShooting = false;
 
-	ALunarticCharacter* const MyCharacter = Cast<ALunarticCharacter>(GetCharacter());
-
-	MuzzleOffset = MyCharacter->GetActorRotation().Vector() * 30;
+	MuzzleOffset = FVector(0, 0, 100);//MyCharacter->GetActorRotation().Vector() * 30;
 
 	FVector MuzzleLocation = MyCharacter->GetActorLocation() + MuzzleOffset;
 	FRotator MuzzleRotation = MyCharacter->GetActorRotation();
@@ -262,9 +263,9 @@ void ALunarticPlayerController::ShootExplosive()
 	UWorld* World = GetWorld();
 	if (World)
 	{
-		FVector startLoc = MyCharacter->GetActorLocation();      // 발사 지점
+		FVector startLoc = MuzzleLocation;    // 발사 지점
 		FVector targetLoc = MyCharacter->GetCursorToWorld()->GetComponentLocation();;  // 타겟 지점.
-		float arcValue = 0.4f;                       // ArcParam (0.0-1.0)
+		float arcValue = 0.4f;                       // ArcParam (0.0-1.0) Determines angle of shooting
 		FVector outVelocity = FVector::ZeroVector;   // 결과 Velocity
 		if (UGameplayStatics::SuggestProjectileVelocity_CustomArc(this, outVelocity, startLoc, targetLoc, GetWorld()->GetGravityZ(), arcValue))
 		{

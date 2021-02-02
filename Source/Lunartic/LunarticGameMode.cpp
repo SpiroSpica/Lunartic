@@ -13,7 +13,7 @@ ALunarticGameMode::ALunarticGameMode()
 	PlayerControllerClass = ALunarticPlayerController::StaticClass();
 
 	// set default pawn class to our Blueprinted character
-	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/TopDownCPP/Blueprints/TopDownCharacter"));
+	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("Blueprint'/Game/PlayerCharacter'"));
 	
 	if (PlayerPawnBPClass.Class != NULL)
 	{

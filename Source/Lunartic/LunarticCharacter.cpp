@@ -8,7 +8,6 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "HeadMountedDisplayFunctionLibrary.h"
 #include "Materials/Material.h"
 #include "LunarticMonsterController.h"
 #include "Engine/World.h"
@@ -43,7 +42,31 @@ ALunarticCharacter::ALunarticCharacter()
 	TopDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
 	Outfit = CreateDefaultSubobject<UStaticMeshComponent>("Appearance");
+	static ConstructorHelpers::FObjectFinder<UStaticMesh>StaticMesh(TEXT("'/Game/Model/Player/SM_player.SM_player'"));
+	if (StaticMesh.Succeeded())
+	{
+		Outfit->SetStaticMesh(StaticMesh.Object);
+	}
+
 	Outfit->SetupAttachment(RootComponent);
+	HoverFL = CreateDefaultSubobject<UNiagaraComponent>("Hover1");
+	HoverFL->SetupAttachment(Outfit);
+
+	HoverFR = CreateDefaultSubobject<UNiagaraComponent>("Hover2");
+	HoverFR->SetupAttachment(Outfit);
+
+	HoverBL = CreateDefaultSubobject<UNiagaraComponent>("Hover3");
+	HoverBL->SetupAttachment(Outfit);
+
+	HoverBR = CreateDefaultSubobject<UNiagaraComponent>("Hover4");
+	HoverBR->SetupAttachment(Outfit);
+
+	Shoot = CreateDefaultSubobject<UNiagaraComponent>("ShootFire");
+	Shoot->SetupAttachment(Outfit);
+
+	HoverSmoke = CreateDefaultSubobject<UNiagaraComponent>("HoverSmoke");
+	HoverSmoke->SetupAttachment(Outfit);
+	
 
 	// Create a decal in the world to show the cursor's location
 	CursorToWorld = CreateDefaultSubobject<UDecalComponent>("CursorToWorld");
@@ -63,6 +86,8 @@ ALunarticCharacter::ALunarticCharacter()
 
 	EnemyCount = 30;
 	HP = 200;
+
+	PastRotationYaw = 0;
 }
 
 void ALunarticCharacter::Tick(float DeltaSeconds)
@@ -87,6 +112,42 @@ void ALunarticCharacter::Tick(float DeltaSeconds)
 			SetActorRotation(Rot);
 		}
 	}
+
+	float CurrentYaw = GetActorRotation().Yaw;
+
+	if (PastRotationYaw < CurrentYaw) 
+	{
+		HoverFL->Deactivate();
+		HoverFR->Activate();
+		HoverBL->Activate();
+		HoverBR->Deactivate();
+	}
+	else if (PastRotationYaw > CurrentYaw)
+	{
+		HoverFL->Activate();
+		HoverFR->Deactivate();
+		HoverBL->Deactivate();
+		HoverBR->Activate();
+	}
+	else
+	{
+		HoverFL->Deactivate();
+		HoverFR->Deactivate();
+		HoverBL->Deactivate();
+		HoverBR->Deactivate();
+	}
+	PastRotationYaw = CurrentYaw;
+}
+
+void ALunarticCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	Shoot->Deactivate();
+	HoverFL->Deactivate();
+	HoverFR->Deactivate();
+	HoverBL->Deactivate();
+	HoverBR->Deactivate();
+
 }
 
 void ALunarticCharacter::OnEnemyKill()
@@ -108,6 +169,18 @@ void ALunarticCharacter::OnTakeDamage(int Damage)
 	if (HP <= 0)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("GameOver"));
+	}
+}
+
+void ALunarticCharacter::FireEffect(bool firing)
+{
+	if (firing)
+	{
+		Shoot->Activate();
+	}
+	else
+	{
+		Shoot->Deactivate();
 	}
 }
 

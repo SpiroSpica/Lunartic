@@ -8,6 +8,7 @@
 #include "Explosive.h"
 #include "LunarticMonster.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "LunarticCharacter.h"
 #include "DrawDebugHelpers.h"
 #include "LunarticPlayerController.generated.h"
 
@@ -76,6 +77,9 @@ protected:
 
 	UPROPERTY()
 	float ShootCooltime;
+
+	UPROPERTY()
+	ALunarticCharacter* MyCharacter;
 
 public:
 
