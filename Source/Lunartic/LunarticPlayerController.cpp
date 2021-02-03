@@ -15,13 +15,12 @@ ALunarticPlayerController::ALunarticPlayerController()
 	WeaponType = 1;
 	ShootCooltime = 1.0f;
 
-	FWeaponStatus tmp1, tmp2, tmp3;
+	FWeaponStatus tmp1, tmp2, tmp3, tmp4;
 	tmp1.Damage = 10;
 	tmp1.ShootInterval = 0.1;
 	tmp1.ReloadInterval = 2;
 	tmp1.MaxAmmo = 40;
 	tmp1.WeaponStyle = 1;
-	
 
 	tmp2.Damage = 5;
 	tmp2.ShootInterval = 0.03;
@@ -35,13 +34,17 @@ ALunarticPlayerController::ALunarticPlayerController()
 	tmp3.MaxAmmo = 3;
 	tmp3.WeaponStyle = 3;
 
+	tmp4.Damage = 3;
+	tmp4.ShootInterval = 0.3;
+	tmp4.ReloadInterval = 2;
+	tmp4.MaxAmmo = 5;
+	tmp4.WeaponStyle = 4;
+
 	Weapon.Emplace(tmp1);
 	Weapon.Emplace(tmp2);
 	Weapon.Emplace(tmp3);
+	Weapon.Emplace(tmp4);
 	
-
-
-	ShootReload = { 0.2f, 0.2f, 1.0f };
 
 }
 
@@ -55,12 +58,18 @@ void ALunarticPlayerController::PlayerTick(float DeltaTime)
 		{
 		case 1:
 			Shoot();
+			MyCharacter->FireEffect(true);
 			break;
 		case 2:
 			HitScan();
+			MyCharacter->FireEffect(true);
 			break;
 		case 3:
 			ShootExplosive();
+			break;
+		case 4:
+			Shotgun();
+			MyCharacter->FireEffect(true);
 			break;
 		}
 		GetWorldTimerManager().SetTimer(MemberTimerHandle, this, &ALunarticPlayerController::AttackLimit, ShootCooltime, false, Weapon[WeaponType].ShootInterval);
@@ -70,6 +79,7 @@ void ALunarticPlayerController::PlayerTick(float DeltaTime)
 void ALunarticPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+	MyCharacter = Cast<ALunarticCharacter>(GetCharacter());
 }
 
 void ALunarticPlayerController::SetupInputComponent()
@@ -87,7 +97,7 @@ void ALunarticPlayerController::SetupInputComponent()
 	InputComponent->BindAction<FCustomIntDelegate>("WeaponChange1", IE_Pressed, this, &ALunarticPlayerController::WeaponChange, 0);
 	InputComponent->BindAction<FCustomIntDelegate>("WeaponChange2", IE_Pressed, this, &ALunarticPlayerController::WeaponChange, 1);
 	InputComponent->BindAction<FCustomIntDelegate>("WeaponChange3", IE_Pressed, this, &ALunarticPlayerController::WeaponChange, 2);
-
+	InputComponent->BindAction<FCustomIntDelegate>("WeaponChange4", IE_Pressed, this, &ALunarticPlayerController::WeaponChange, 3);
 	
 	InputComponent->BindAxis(TEXT("MoveForWard"), this, &ALunarticPlayerController::UpDown);
 	InputComponent->BindAxis(TEXT("MoveRight"), this, &ALunarticPlayerController::LeftRight);
@@ -99,7 +109,6 @@ void ALunarticPlayerController::StartShoot()
 	if (SpecialWeaponFlag)
 	{
 		UKismetSystemLibrary::FlushPersistentDebugLines(GetWorld());
-		ALunarticCharacter* MyCharacter = Cast<ALunarticCharacter>(GetCharacter());
 		
 		FVector ExplosionLocation = MyCharacter->GetCursorToWorld()->GetComponentLocation();
 
@@ -142,12 +151,12 @@ void ALunarticPlayerController::StartShoot()
 
 void ALunarticPlayerController::EndShoot()
 {
+	MyCharacter->FireEffect(false);
 	isFire = false;
 }
 
 void ALunarticPlayerController::Bomb()
 {
-	ALunarticCharacter* MyCharacter = Cast<ALunarticCharacter>(GetCharacter());
 	if (SpecialWeaponFlag == false)
 	{
 		SpecialWeaponFlag = true;
@@ -167,7 +176,6 @@ void ALunarticPlayerController::WeaponChange(int type)
 
 void ALunarticPlayerController::UpDown(float NewAxisValue)
 {
-	ACharacter* const MyCharacter = GetCharacter();
 	if (MyCharacter && NewAxisValue != 0.0f)
 	{
 		FRotator rot = GetControlRotation();
@@ -179,7 +187,6 @@ void ALunarticPlayerController::UpDown(float NewAxisValue)
 
 void ALunarticPlayerController::LeftRight(float NewAxisValue)
 {
-	ACharacter* const MyCharacter = GetCharacter();
 	if (MyCharacter && NewAxisValue != 0.0f)
 	{
 		FRotator rot = GetControlRotation();
@@ -193,15 +200,24 @@ void ALunarticPlayerController::HitScan()
 {
 	notShooting = false;
 	FHitResult target;
-	ACharacter* const MyCharacter = GetCharacter();
 
-	FVector start = MyCharacter->GetActorLocation();
-	FVector end = start + MyCharacter->GetActorRotation().Vector() * 10000.0f;
+	FName TraceLine("HitScanTrace");
+
+	GetWorld()->DebugDrawTraceTag = TraceLine;
+	FVector offset = MyCharacter->GetActorRotation().Vector() * 120 + FVector(0, 0, 85);
+	FVector start = MyCharacter->GetActorLocation() + offset;
+	float RandomValRoll = FMath::RandRange(-3, 3);
+	float RandomValPitch = FMath::RandRange(-3, 3);
+	//add rebound from shooting by adding Random value to Yaw
+
+	FVector end = start + (MyCharacter->GetActorRotation() + FRotator(RandomValRoll, RandomValPitch, 0)).Vector() * 10000.0f;
+	//FVector end = start + MyCharacter->GetActorRotation().Vector() * 10000.0f;
 	FCollisionQueryParams collisionParams;
 	collisionParams.bTraceComplex = true;
 	collisionParams.bDebugQuery = true;
 	collisionParams.bIgnoreBlocks = false;
 	collisionParams.AddIgnoredActor(MyCharacter);
+	collisionParams.TraceTag = TraceLine;
 	
 	if (MyCharacter->GetWorld()->LineTraceSingleByChannel(target, start, end, ECC_WorldStatic, collisionParams))
 	{
@@ -221,14 +237,59 @@ void ALunarticPlayerController::HitScan()
 	}
 }
 
+void ALunarticPlayerController::Shotgun()
+{
+	notShooting = false;
+	FHitResult target;
+
+	FName TraceLine("HitScanTrace");
+
+	GetWorld()->DebugDrawTraceTag = TraceLine;
+	FVector offset = MyCharacter->GetActorRotation().Vector() * 120 + FVector(0, 0, 85);
+	FVector start = MyCharacter->GetActorLocation() + offset;
+	FCollisionQueryParams collisionParams;
+	collisionParams.bTraceComplex = true;
+	collisionParams.bDebugQuery = true;
+	collisionParams.bIgnoreBlocks = false;
+	collisionParams.AddIgnoredActor(MyCharacter);
+	collisionParams.TraceTag = TraceLine;
+
+	for (int i = 0; i < 50; i++)
+	{
+		float RandomValRoll = FMath::RandRange(-7.5f, 7.5f);
+		float RandomValPitch = FMath::RandRange(-7.5f, 7.5f);
+		//add rebound from shooting by adding Random value to Yaw
+
+		FVector end = start + (MyCharacter->GetActorRotation() + FRotator(RandomValRoll, RandomValPitch, 0)).Vector() * 1200.0f;
+		//FVector end = start + MyCharacter->GetActorRotation().Vector() * 10000.0f;
+
+
+		if (MyCharacter->GetWorld()->LineTraceSingleByChannel(target, start, end, ECC_WorldStatic, collisionParams))
+		{
+			FString targetName;
+			target.GetActor()->GetName(targetName);
+			//target.GetActor->
+			UE_LOG(LogTemp, Log, TEXT("%s"), *targetName);
+			if (target.GetActor()->Tags.Contains("Enemy"))
+			{
+				ALunarticMonster* Monster = Cast<ALunarticMonster>(target.GetActor());
+				Monster->OnTakeDamage(Weapon[WeaponType].Damage);
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("Fail"));
+		}
+	}
+	
+}
+
 void ALunarticPlayerController::Shoot()
 {
 	notShooting = false;
 	
-	ACharacter* const MyCharacter = GetCharacter();
+	MuzzleOffset = MyCharacter->GetActorRotation().Vector() * 120 + FVector(0,0,85);
 	
-	MuzzleOffset = MyCharacter->GetActorRotation().Vector() * 30;
-
 	FVector MuzzleLocation = MyCharacter->GetActorLocation() + MuzzleOffset;
 	FRotator MuzzleRotation = MyCharacter->GetActorRotation();
 
@@ -246,15 +307,14 @@ void ALunarticPlayerController::Shoot()
 			Projectile->Damage = Weapon[WeaponType].Damage;
 		}
 	}
+	
 }
 
 void ALunarticPlayerController::ShootExplosive()
 {
 	notShooting = false;
 
-	ALunarticCharacter* const MyCharacter = Cast<ALunarticCharacter>(GetCharacter());
-
-	MuzzleOffset = MyCharacter->GetActorRotation().Vector() * 30;
+	MuzzleOffset = FVector(0, 0, 100);//MyCharacter->GetActorRotation().Vector() * 30;
 
 	FVector MuzzleLocation = MyCharacter->GetActorLocation() + MuzzleOffset;
 	FRotator MuzzleRotation = MyCharacter->GetActorRotation();
@@ -262,9 +322,9 @@ void ALunarticPlayerController::ShootExplosive()
 	UWorld* World = GetWorld();
 	if (World)
 	{
-		FVector startLoc = MyCharacter->GetActorLocation();      // 발사 지점
+		FVector startLoc = MuzzleLocation;    // 발사 지점
 		FVector targetLoc = MyCharacter->GetCursorToWorld()->GetComponentLocation();;  // 타겟 지점.
-		float arcValue = 0.4f;                       // ArcParam (0.0-1.0)
+		float arcValue = 0.4f;                       // ArcParam (0.0-1.0) Determines angle of shooting
 		FVector outVelocity = FVector::ZeroVector;   // 결과 Velocity
 		if (UGameplayStatics::SuggestProjectileVelocity_CustomArc(this, outVelocity, startLoc, targetLoc, GetWorld()->GetGravityZ(), arcValue))
 		{
