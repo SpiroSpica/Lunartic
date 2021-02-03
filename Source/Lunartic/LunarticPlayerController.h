@@ -112,6 +112,9 @@ public:
 	UFUNCTION()
 	void Bomb();
 
+	UFUNCTION()
+	void Shotgun();
+
 	UPROPERTY(VisibleAnyWhere)
 	bool SpecialWeaponFlag;
 
