@@ -1,22 +1,21 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#include "Enemy_FlameThrower.h"
+#include "LunarticMonsterController.h"
+#include "Enemy_FlameThrower_Attack.h"
 
-#include "CannonAttack.h"
-#include "Enemy_Cannon_Controller.h"
-#include "Enemy_Cannon.h"
-
-UCannonAttack::UCannonAttack()
+UEnemy_FlameThrower_Attack::UEnemy_FlameThrower_Attack()
 {
 	bNotifyTick = true;
 	IsAttacking = false;
 }
 
-EBTNodeResult::Type UCannonAttack::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
+EBTNodeResult::Type UEnemy_FlameThrower_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	EBTNodeResult::Type Result = UBTTaskNode::ExecuteTask(OwnerComp, NodeMemory);
 
-	AEnemy_Cannon* Chara = Cast<AEnemy_Cannon>(OwnerComp.GetAIOwner()->GetPawn());
-	
+	AEnemy_FlameThrower* Chara = Cast<AEnemy_FlameThrower>(OwnerComp.GetAIOwner()->GetPawn());
+
 	if (Chara == nullptr)
 	{
 		EBTNodeResult::Failed;
@@ -36,7 +35,7 @@ EBTNodeResult::Type UCannonAttack::ExecuteTask(UBehaviorTreeComponent& OwnerComp
 	return EBTNodeResult::InProgress;
 }
 
-void UCannonAttack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
+void UEnemy_FlameThrower_Attack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
 	UBTTaskNode::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
 

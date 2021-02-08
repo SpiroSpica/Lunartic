@@ -31,7 +31,7 @@ AMonsterSpawner::AMonsterSpawner()
 
 	SpawnPoint->SetRelativeScale3D(FVector(0.5, 0.5, 0.5));
 
-	static ConstructorHelpers::FObjectFinder<UBlueprint> Unit(TEXT("'/Game/Enemy/Enemy_Cannon.Enemy_Cannon'"));
+	static ConstructorHelpers::FObjectFinder<UBlueprint> Unit(TEXT("Blueprint'/Game/Enemy/FlameThrower/Enemy_FlameThrower_BP.Enemy_FlameThrower_BP'"));
 	if (Unit.Object != nullptr)
 	{
 		UnitToSpawn = (UClass*)Unit.Object->GeneratedClass;

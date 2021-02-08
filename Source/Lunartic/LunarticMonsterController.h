@@ -33,13 +33,14 @@ public:
 	static const FName TargetKey;
 	static const FName HomePosKey;
 
-private:
-	void OnRepeatTimer();
-	FTimerHandle RepeatTimerHandle;
-	float RepeatInterval;
-
+protected:
 	UPROPERTY()
 	class UBehaviorTree* BTAsset;
+	
+	UPROPERTY()
 	class UBlackboardData* BBAsset;
+
+private:
+	
 
 };

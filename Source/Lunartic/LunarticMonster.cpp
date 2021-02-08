@@ -58,6 +58,7 @@ void ALunarticMonster::OnTakeDamage(int Damage)
 	HP -= Damage;
 	if (HP <= 0)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("HP: %d"), HP);
 		MyCharacter->OnEnemyKill();
 		this->Destroy();
 	}

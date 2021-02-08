@@ -211,7 +211,7 @@ void ALunarticPlayerController::HitScan()
 	//add rebound from shooting by adding Random value to Yaw
 
 	FVector end = start + (MyCharacter->GetActorRotation() + FRotator(RandomValRoll, RandomValPitch, 0)).Vector() * 10000.0f;
-	//FVector end = start + MyCharacter->GetActorRotation().Vector() * 10000.0f;
+	
 	FCollisionQueryParams collisionParams;
 	collisionParams.bTraceComplex = true;
 	collisionParams.bDebugQuery = true;

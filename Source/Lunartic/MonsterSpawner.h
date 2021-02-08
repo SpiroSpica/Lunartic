@@ -27,7 +27,7 @@ public:
 	UPROPERTY()
 	TArray<ALunarticMonster*> UnitSave;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UClass* UnitToSpawn;
 
 	UPROPERTY()

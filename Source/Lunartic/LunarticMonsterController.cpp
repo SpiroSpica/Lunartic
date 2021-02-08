@@ -11,19 +11,19 @@ const FName ALunarticMonsterController::TargetKey(TEXT("Target"));
 const FName ALunarticMonsterController::HomePosKey(TEXT("HomePos"));
 
 ALunarticMonsterController::ALunarticMonsterController()
-{
-	static ConstructorHelpers::FObjectFinder<UBlackboardData> BBData(TEXT("'/Game/EnemyBB.EnemyBB'"));
+{/*
+	static ConstructorHelpers::FObjectFinder<UBlackboardData> BBData(TEXT("BlackboardData'/Game/Enemy/Cannon/Enemy_Cannon_BB.Enemy_Cannon_BB'"));
 	if (BBData.Succeeded())
 	{
 		BBAsset = BBData.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UBehaviorTree> BTData(TEXT("'/Game/EnemyBT.EnemyBT'"));
+	static ConstructorHelpers::FObjectFinder<UBehaviorTree> BTData(TEXT("BehaviorTree'/Game/Enemy/Cannon/Enemy_Cannon_BT.Enemy_Cannon_BT'"));
 	if (BTData.Succeeded())
 	{
 		BTAsset = BTData.Object;
 	}
-	RepeatInterval = 0.1f;
+	*/
 }
 
 void ALunarticMonsterController::BeginPlay()
@@ -34,6 +34,8 @@ void ALunarticMonsterController::BeginPlay()
 void ALunarticMonsterController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
+
+	UE_LOG(LogTemp, Warning, TEXT("OnPossess Working"));
 
 	if (UseBlackboard(BBAsset, Blackboard))
 	{
