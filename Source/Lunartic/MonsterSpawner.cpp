@@ -75,7 +75,6 @@ void AMonsterSpawner::Tick(float DeltaTime)
 		isGameRunning = false;
 		StageClear();
 	}
-
 }
 
 void AMonsterSpawner::StageClear()

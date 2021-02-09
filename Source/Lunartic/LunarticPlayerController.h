@@ -9,6 +9,7 @@
 #include "LunarticMonster.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "LunarticCharacter.h"
+#include "InGameWidget.h"
 #include "DrawDebugHelpers.h"
 #include "LunarticPlayerController.generated.h"
 
@@ -52,6 +53,8 @@ class ALunarticPlayerController : public APlayerController
 public:
 	ALunarticPlayerController();
 
+	class UInGameWidget* GetHud() const;
+
 protected:
 
 	// Begin PlayerController interface
@@ -80,6 +83,15 @@ protected:
 
 	UPROPERTY()
 	ALunarticCharacter* MyCharacter;
+
+	UPROPERTY(EditDefaultsOnly, BLueprintReadWrite, Category = UI)
+	TSubclassOf<class UInGameWidget> HudClass;
+
+
+private:
+
+	UPROPERTY()
+	class UInGameWidget* Hud;
 
 public:
 
@@ -126,5 +138,8 @@ public:
 
 	UPROPERTY(VisibleAnyWhere)
 	int WeaponType;
+
+
+
 };
 

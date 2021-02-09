@@ -3,7 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "InGameWidget.h"
 #include "GameFramework/GameModeBase.h"
+#include "Components/WidgetComponent.h"
 #include "LunarticGameMode.generated.h"
 
 UCLASS(minimalapi)
@@ -20,8 +22,15 @@ public:
 	UFUNCTION()
 	bool isStageCleared();
 
+	UFUNCTION()
+	void PauseGame();
+
 	UPROPERTY(VisibleAnywhere)
 	bool ClearFlag;
+
+	UPROPERTY()
+	FTimerHandle PauseTimer;
+
 };
 
 

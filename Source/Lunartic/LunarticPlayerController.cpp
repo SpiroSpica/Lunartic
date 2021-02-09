@@ -3,6 +3,7 @@
 #include "LunarticPlayerController.h"
 #include "Runtime/Engine/Classes/Components/DecalComponent.h"
 #include "LunarticCharacter.h"
+
 #include "Engine/World.h"
 
 ALunarticPlayerController::ALunarticPlayerController()
@@ -45,7 +46,16 @@ ALunarticPlayerController::ALunarticPlayerController()
 	Weapon.Emplace(tmp3);
 	Weapon.Emplace(tmp4);
 	
-
+	static ConstructorHelpers::FClassFinder<UInGameWidget> UI_HUD(TEXT("WidgetBlueprint'/Game/UI/InGameWidget_BP.InGameWidget_BP_C'"));
+	if (UI_HUD.Succeeded())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UI_HUD implemnted"));
+		HudClass = UI_HUD.Class;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UI_HUD failed"));
+	}
 }
 
 void ALunarticPlayerController::PlayerTick(float DeltaTime)
@@ -80,6 +90,9 @@ void ALunarticPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 	MyCharacter = Cast<ALunarticCharacter>(GetCharacter());
+
+	Hud = CreateWidget<UInGameWidget>(this, HudClass);
+	Hud->AddToViewport();
 }
 
 void ALunarticPlayerController::SetupInputComponent()
@@ -344,4 +357,10 @@ void ALunarticPlayerController::ShootExplosive()
 void ALunarticPlayerController::AttackLimit()
 {
 	notShooting = true;
+}
+
+
+UInGameWidget* ALunarticPlayerController::GetHud() const
+{
+	return Hud;
 }

@@ -4,6 +4,7 @@
 #include "LunarticPlayerController.h"
 #include "LunarticCharacter.h"
 #include "MonsterSpawner.h"
+
 #include "UObject/ConstructorHelpers.h"
 
 ALunarticGameMode::ALunarticGameMode()
@@ -19,19 +20,28 @@ ALunarticGameMode::ALunarticGameMode()
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
+
 }
+
 
 void ALunarticGameMode::StageClear()
 {
 	ClearFlag = true;
-	APlayerController* const MyPlayer = Cast<APlayerController>(GEngine->GetFirstLocalPlayerController(GetWorld()));
-	if (MyPlayer != NULL)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Should be paused"));
-	}
+	GetWorld()->GetTimerManager().SetTimer(PauseTimer, this, &ALunarticGameMode::PauseGame, 2.0f, false);
 }
 
 bool ALunarticGameMode::isStageCleared()
 {
 	return ClearFlag;
+}
+
+void ALunarticGameMode::PauseGame()
+{
+	APlayerController* const MyPlayer = Cast<APlayerController>(GEngine->GetFirstLocalPlayerController(GetWorld()));
+	if (MyPlayer != NULL)
+	{
+		MyPlayer->SetPause(true);
+
+		UE_LOG(LogTemp, Warning, TEXT("Should be paused"));
+	}
 }
