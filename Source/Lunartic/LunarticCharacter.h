@@ -34,6 +34,9 @@ public:
 
 	UPROPERTY()
 	int EnemyCount;
+	UPROPERTY()
+	int RequiredKill;
+
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	int HP;
@@ -43,6 +46,12 @@ public:
 
 	UFUNCTION()
 	void OnTakeDamage(int Damage);
+
+	UFUNCTION()
+	int GetHP();
+
+	UFUNCTION()
+	int GetKillCount();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UStaticMeshComponent* Outfit;

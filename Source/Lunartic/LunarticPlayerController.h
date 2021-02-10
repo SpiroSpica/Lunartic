@@ -28,18 +28,27 @@ struct FWeaponStatus
 	GENERATED_BODY()
 
 public:
+
+	//damage dealt to the enemy
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Damage;
 
+	//time between each shoot
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float ShootInterval;
 
+	//maximum number of ammo possible. gun will be reloaded to this number after reload
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 MaxAmmo;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 CurrentAmmo;
+
+	//time required to reload
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float ReloadInterval;
 
+	//1 = projectile, 2 = hitscan, 3 = artilery projectile, 4 = shotgun
 	uint8 WeaponStyle;
 };
 
@@ -57,11 +66,11 @@ public:
 
 protected:
 
-	// Begin PlayerController interface
+	
 	virtual void PlayerTick(float DeltaTime) override;
 	virtual void SetupInputComponent() override;
 	virtual void BeginPlay() override;
-	// End PlayerController interface
+	
 
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
 	TSubclassOf<class AAProjectile> ProjectileClass;
@@ -95,23 +104,25 @@ private:
 
 public:
 
+	//player movement function
 	UFUNCTION()
 	void UpDown(float NewAxisValue);
 	UFUNCTION()
 	void LeftRight(float NewAxisValue);
 
+	//player shooting function
 	UFUNCTION()
 	void Shoot();
-
 	UFUNCTION()
 	void ShootExplosive();
-	
 	UFUNCTION()
 	void HitScan();
-		
+	UFUNCTION()
+	void Shotgun();
+
+	//Shooting handle mechanism
 	UFUNCTION()
 	void StartShoot();
-
 	UFUNCTION()
 	void EndShoot();
 
@@ -124,8 +135,18 @@ public:
 	UFUNCTION()
 	void Bomb();
 
+	
 	UFUNCTION()
-	void Shotgun();
+	void Reload();
+	UFUNCTION()
+	void ReloadWeapon();
+
+	UFUNCTION()
+	void OnTakeDamage(int HP);
+
+	UFUNCTION()
+	void OnEnemyKill(int Num);
+
 
 	UPROPERTY(VisibleAnyWhere)
 	bool SpecialWeaponFlag;
@@ -135,6 +156,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Timer)
 	FTimerHandle MemberTimerHandle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Timer)
+	FTimerHandle ReloadTimerHandle;
+
+	UPROPERTY(VisibleAnyWhere)
+	bool ReloadFlag;
 
 	UPROPERTY(VisibleAnyWhere)
 	int WeaponType;

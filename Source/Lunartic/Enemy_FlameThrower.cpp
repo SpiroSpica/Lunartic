@@ -116,8 +116,6 @@ void AEnemy_FlameThrower::FlameDamage()
 	UClass* seekClass = ALunarticCharacter::StaticClass();
 	UKismetSystemLibrary::SphereOverlapActors(GetWorld(), Location, radius, traceObjectTypes, seekClass, ignoreActors, outActors);
 
-	DrawDebugSphere(GetWorld(), Location, radius, 12, FColor::Green, true, 10.0f);
-
 	for (AActor* overlappedActor : outActors)
 	{
 		ALunarticCharacter* Character = Cast<ALunarticCharacter>(overlappedActor);

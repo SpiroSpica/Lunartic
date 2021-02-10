@@ -84,7 +84,8 @@ ALunarticCharacter::ALunarticCharacter()
 	PrimaryActorTick.bStartWithTickEnabled = true;
 
 
-	EnemyCount = 30;
+	EnemyCount = 0;
+	RequiredKill = 30;
 	HP = 200;
 
 	PastRotationYaw = 0;
@@ -152,9 +153,9 @@ void ALunarticCharacter::BeginPlay()
 
 void ALunarticCharacter::OnEnemyKill()
 {
-	EnemyCount--;
-	
-	if (EnemyCount <= 0)
+	EnemyCount++;
+
+	if (EnemyCount >= RequiredKill)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("cleared"));
 		GetWorld()->GetAuthGameMode<ALunarticGameMode>()->StageClear();
@@ -184,3 +185,12 @@ void ALunarticCharacter::FireEffect(bool firing)
 	}
 }
 
+int ALunarticCharacter::GetHP()
+{
+	return HP;
+}
+
+int ALunarticCharacter::GetKillCount()
+{
+	return EnemyCount;
+}
