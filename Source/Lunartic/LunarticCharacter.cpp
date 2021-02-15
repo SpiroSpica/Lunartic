@@ -154,22 +154,15 @@ void ALunarticCharacter::BeginPlay()
 void ALunarticCharacter::OnEnemyKill()
 {
 	EnemyCount++;
-
-	if (EnemyCount >= RequiredKill)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("cleared"));
-		GetWorld()->GetAuthGameMode<ALunarticGameMode>()->StageClear();
-	}
 }
 
 void ALunarticCharacter::OnTakeDamage(int Damage)
 {
 	HP -= Damage;
 
-	UE_LOG(LogTemp, Warning, TEXT("CurrentHP: :%d"), HP);
 	if (HP <= 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("GameOver"));
+		//UE_LOG(LogTemp, Warning, TEXT("GameOver"));
 	}
 }
 

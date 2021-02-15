@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/TextBlock.h"
+#include "Components/Button.h"
 #include "InGameWidget.generated.h"
 
 /**
@@ -21,9 +22,6 @@ public:
 
 
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-	class UTextBlock* NextStage;
-
-	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	class UTextBlock* HPStat;
 
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
@@ -34,6 +32,15 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	class UTextBlock* ReloadText;
+	
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	class UWidget* NextLevelScreen;
+	
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	class UButton* NextLevelButton;
+	
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	class UButton* CancelButton;
 
 	UFUNCTION()
 	void SetKillCount(int _Count);
@@ -47,7 +54,14 @@ public:
 	UFUNCTION()
 	void ReloadAlarm(bool Switch);
 
+	UFUNCTION()
+	void BlurScreen(bool Switch);
 
+	UFUNCTION()
+	void SendToNextLevel();
+
+	UFUNCTION()
+	void BackToMenu();
 
 protected:
 

@@ -142,11 +142,10 @@ public:
 	void ReloadWeapon();
 
 	UFUNCTION()
-	void OnTakeDamage(int HP);
-
-	UFUNCTION()
 	void OnEnemyKill(int Num);
 
+	UFUNCTION()
+	void EndGame();
 
 	UPROPERTY(VisibleAnyWhere)
 	bool SpecialWeaponFlag;
@@ -160,13 +159,23 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Timer)
 	FTimerHandle ReloadTimerHandle;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Timer)
+	FTimerHandle GameEndTimerHandle;
+
 	UPROPERTY(VisibleAnyWhere)
 	bool ReloadFlag;
 
 	UPROPERTY(VisibleAnyWhere)
+	bool GameEndFlag;
+
+	UPROPERTY(VisibleAnyWhere)
 	int WeaponType;
 
+	UPROPERTY(VisibleAnyWhere)
+	int KillCount;
 
+	UPROPERTY(VisibleAnywhere)
+	int RequiredKill;
 
 };
 

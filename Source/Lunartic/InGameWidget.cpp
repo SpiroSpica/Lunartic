@@ -35,11 +35,11 @@ void UInGameWidget::ReloadAlarm(bool Switch)
 	FString tmp;
 	if (Switch)
 	{
-		tmp = "";
+		tmp = "RELOADING"; 
 	}
 	else
 	{
-		tmp = "RELOADING";
+		tmp = "";
 	}
 
 	FText ReloadAlarmText = FText::FromString(tmp);
@@ -47,12 +47,45 @@ void UInGameWidget::ReloadAlarm(bool Switch)
 
 }
 
+void UInGameWidget::BlurScreen(bool Switch)
+{
+	if (Switch)
+	{
+		NextLevelScreen->SetVisibility(ESlateVisibility::Visible);
+	}
+	else
+	{
+		NextLevelScreen->SetVisibility(ESlateVisibility::Hidden);
+	}
+	
+}
+
+void UInGameWidget::SendToNextLevel()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Send to next level"));
+}
+
+void UInGameWidget::BackToMenu()
+{
+	UE_LOG(LogTemp, Warning, TEXT("BackToMenu"));
+}
+
 void UInGameWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	FText test = FText::FromString("testOngoing");
-	NextStage->SetText(test);
+	NextLevelScreen->SetVisibility(ESlateVisibility::Hidden);
+
+	if (!NextLevelButton->OnClicked.IsBound())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("1"));
+		NextLevelButton->OnClicked.AddDynamic(this, &UInGameWidget::SendToNextLevel);
+	}
+	if (!CancelButton->OnClicked.IsBound())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("2"));
+		CancelButton->OnClicked.AddDynamic(this, &UInGameWidget::BackToMenu);
+	}
 
 	UE_LOG(LogTemp, Warning, TEXT("InGameWidget implemnted"));
 }

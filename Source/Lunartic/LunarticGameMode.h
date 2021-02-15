@@ -22,9 +22,6 @@ public:
 	UFUNCTION()
 	bool isStageCleared();
 
-	UFUNCTION()
-	void PauseGame();
-
 	UPROPERTY(VisibleAnywhere)
 	bool ClearFlag;
 

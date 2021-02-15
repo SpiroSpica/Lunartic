@@ -27,21 +27,9 @@ ALunarticGameMode::ALunarticGameMode()
 void ALunarticGameMode::StageClear()
 {
 	ClearFlag = true;
-	GetWorld()->GetTimerManager().SetTimer(PauseTimer, this, &ALunarticGameMode::PauseGame, 2.0f, false);
 }
 
 bool ALunarticGameMode::isStageCleared()
 {
 	return ClearFlag;
-}
-
-void ALunarticGameMode::PauseGame()
-{
-	APlayerController* const MyPlayer = Cast<APlayerController>(GEngine->GetFirstLocalPlayerController(GetWorld()));
-	if (MyPlayer != NULL)
-	{
-		MyPlayer->SetPause(true);
-
-		UE_LOG(LogTemp, Warning, TEXT("Should be paused"));
-	}
 }

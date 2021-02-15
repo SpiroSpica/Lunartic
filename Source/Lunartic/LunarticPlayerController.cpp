@@ -51,6 +51,9 @@ ALunarticPlayerController::ALunarticPlayerController()
 	Weapon.Emplace(tmp3);
 	Weapon.Emplace(tmp4);
 	
+
+	RequiredKill = 40;
+
 	static ConstructorHelpers::FClassFinder<UInGameWidget> UI_HUD(TEXT("WidgetBlueprint'/Game/UI/InGameWidget_BP.InGameWidget_BP_C'"));
 	if (UI_HUD.Succeeded())
 	{
@@ -99,7 +102,16 @@ void ALunarticPlayerController::PlayerTick(float DeltaTime)
 		}
 	}
 	Hud->SetHP(MyCharacter->GetHP());
-	Hud->SetKillCount(MyCharacter->GetKillCount());
+
+	KillCount = MyCharacter->GetKillCount();
+	Hud->SetKillCount(KillCount);
+
+	if (!GameEndFlag && KillCount >= RequiredKill)
+	{
+		GameEndFlag = true;
+		GetWorldTimerManager().SetTimer(GameEndTimerHandle, this, &ALunarticPlayerController::EndGame,2.0f,false);
+		GetWorld()->GetAuthGameMode<ALunarticGameMode>()->StageClear();
+	}
 }
 
 void ALunarticPlayerController::BeginPlay()
@@ -112,7 +124,11 @@ void ALunarticPlayerController::BeginPlay()
 	Hud->SetKillCount(0);
 	Hud->SetHP(MyCharacter->HP);
 	Hud->SetWeaponStatus(WeaponType, Weapon[WeaponType].CurrentAmmo, Weapon[WeaponType].MaxAmmo);
-	Hud->ReloadAlarm(true);
+	Hud->ReloadAlarm(false);
+
+	KillCount = MyCharacter->GetKillCount();
+
+	GameEndFlag = false;
 }
 
 void ALunarticPlayerController::SetupInputComponent()
@@ -206,7 +222,7 @@ void ALunarticPlayerController::Bomb()
 void ALunarticPlayerController::WeaponChange(int type)
 {
 	GetWorld()->GetTimerManager().ClearTimer(ReloadTimerHandle);
-	Hud->ReloadAlarm(true);
+	Hud->ReloadAlarm(false);
 	ReloadFlag = false;
 	WeaponType = type;
 	Hud->SetWeaponStatus(WeaponType, Weapon[WeaponType].CurrentAmmo, Weapon[WeaponType].MaxAmmo);
@@ -394,8 +410,8 @@ UInGameWidget* ALunarticPlayerController::GetHud() const
 void ALunarticPlayerController::Reload()
 {
 	ReloadFlag = true;
-	Hud->ReloadAlarm(false);
-	GetWorldTimerManager().SetTimer(MemberTimerHandle, this, &ALunarticPlayerController::ReloadWeapon, ShootCooltime, false, Weapon[WeaponType].ReloadInterval);
+	Hud->ReloadAlarm(true);
+	GetWorldTimerManager().SetTimer(ReloadTimerHandle, this, &ALunarticPlayerController::ReloadWeapon, ShootCooltime, false, Weapon[WeaponType].ReloadInterval);
 }
 
 void ALunarticPlayerController::ReloadWeapon()
@@ -403,16 +419,17 @@ void ALunarticPlayerController::ReloadWeapon()
 	Weapon[WeaponType].CurrentAmmo = Weapon[WeaponType].MaxAmmo;
 	Hud->SetWeaponStatus(WeaponType, Weapon[WeaponType].CurrentAmmo, Weapon[WeaponType].MaxAmmo);
 	ReloadFlag = false;
-	Hud->ReloadAlarm(true);
+	Hud->ReloadAlarm(false);
 }
 
-void ALunarticPlayerController::OnTakeDamage(int _HP)
-{
-	Hud->SetHP(_HP);
-
-}
 
 void ALunarticPlayerController::OnEnemyKill(int Num)
 {
 	Hud->SetKillCount(Num);
+}
+
+void ALunarticPlayerController::EndGame()
+{
+	Hud->BlurScreen(true);
+	SetPause(true);
 }
