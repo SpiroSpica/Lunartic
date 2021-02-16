@@ -11,6 +11,7 @@
 #include "LunarticCharacter.h"
 #include "InGameWidget.h"
 #include "DrawDebugHelpers.h"
+#include "LunarticGameInstance.h"
 #include "LunarticPlayerController.generated.h"
 
 
@@ -63,6 +64,7 @@ public:
 	ALunarticPlayerController();
 
 	class UInGameWidget* GetHud() const;
+	ULunarticGameInstance* GameInstance;
 
 protected:
 
@@ -101,6 +103,9 @@ private:
 
 	UPROPERTY()
 	class UInGameWidget* Hud;
+
+	UPROPERTY()
+	int CharacterHP;
 
 public:
 
@@ -146,6 +151,9 @@ public:
 
 	UFUNCTION()
 	void EndGame();
+
+	UFUNCTION()
+	void FailGame();
 
 	UPROPERTY(VisibleAnyWhere)
 	bool SpecialWeaponFlag;

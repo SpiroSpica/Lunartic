@@ -60,9 +60,29 @@ void UInGameWidget::BlurScreen(bool Switch)
 	
 }
 
+void UInGameWidget::FailedScreen(bool Switch)
+{
+	if (Switch)
+	{
+		FailLevelScreen->SetVisibility(ESlateVisibility::Visible);
+	}
+	else
+	{
+		FailLevelScreen->SetVisibility(ESlateVisibility::Hidden);
+	}
+}
+
 void UInGameWidget::SendToNextLevel()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Send to next level"));
+	GameInstance->LevelUp();
+	UGameplayStatics::OpenLevel(this,"TopDownExampleMap");
+
+}
+
+void UInGameWidget::RetryThisLevel()
+{
+	UGameplayStatics::OpenLevel(this, "TopDownExampleMap");
 }
 
 void UInGameWidget::BackToMenu()
@@ -75,17 +95,28 @@ void UInGameWidget::NativeConstruct()
 	Super::NativeConstruct();
 
 	NextLevelScreen->SetVisibility(ESlateVisibility::Hidden);
+	FailLevelScreen->SetVisibility(ESlateVisibility::Hidden);
 
 	if (!NextLevelButton->OnClicked.IsBound())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("1"));
 		NextLevelButton->OnClicked.AddDynamic(this, &UInGameWidget::SendToNextLevel);
 	}
 	if (!CancelButton->OnClicked.IsBound())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("2"));
 		CancelButton->OnClicked.AddDynamic(this, &UInGameWidget::BackToMenu);
 	}
+	if (!RetryButton->OnClicked.IsBound())
+	{
+		RetryButton->OnClicked.AddDynamic(this, &UInGameWidget::RetryThisLevel);
+	}
+	if (!ExitButton->OnClicked.IsBound())
+	{
+		ExitButton->OnClicked.AddDynamic(this, &UInGameWidget::BackToMenu);
+	}
 
-	UE_LOG(LogTemp, Warning, TEXT("InGameWidget implemnted"));
+	GameInstance =  Cast<ULunarticGameInstance>(GetGameInstance());
+	
+	FString tmp = FString::Printf(TEXT("Stage %d"), GameInstance->GetLevel());
+	FText StageLV = FText::FromString(tmp);
+	StageLevel->SetText(StageLV);
 }

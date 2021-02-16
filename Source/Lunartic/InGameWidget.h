@@ -6,6 +6,8 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/TextBlock.h"
 #include "Components/Button.h"
+#include "LunarticGameInstance.h"
+#include "Kismet/GameplayStatics.h"
 #include "InGameWidget.generated.h"
 
 /**
@@ -19,8 +21,6 @@ class LUNARTIC_API UInGameWidget : public UUserWidget
 	
 
 public:
-
-
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	class UTextBlock* HPStat;
 
@@ -32,15 +32,27 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	class UTextBlock* ReloadText;
-	
+
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	class UTextBlock* StageLevel;
+
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	class UWidget* NextLevelScreen;
-	
+
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	class UButton* NextLevelButton;
-	
+
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	class UButton* CancelButton;
+
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	class UWidget* FailLevelScreen;
+
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	class UButton* RetryButton;
+
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	class UButton* ExitButton;
 
 	UFUNCTION()
 	void SetKillCount(int _Count);
@@ -58,10 +70,20 @@ public:
 	void BlurScreen(bool Switch);
 
 	UFUNCTION()
+	void FailedScreen(bool Switch);
+
+
+private:
+	
+	UFUNCTION()
 	void SendToNextLevel();
 
 	UFUNCTION()
 	void BackToMenu();
+
+	UFUNCTION()
+	void RetryThisLevel();
+
 
 protected:
 
@@ -82,4 +104,8 @@ protected:
 	UPROPERTY()
 	int MaxAmmo;
 
+	UPROPERTY()
+	ULunarticGameInstance* GameInstance;
+
+	
 };

@@ -158,12 +158,7 @@ void ALunarticCharacter::OnEnemyKill()
 
 void ALunarticCharacter::OnTakeDamage(int Damage)
 {
-	HP -= Damage;
-
-	if (HP <= 0)
-	{
-		//UE_LOG(LogTemp, Warning, TEXT("GameOver"));
-	}
+	HP = FGenericPlatformMath::Max(0, HP - Damage);
 }
 
 void ALunarticCharacter::FireEffect(bool firing)

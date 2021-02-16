@@ -22,8 +22,13 @@ public:
 	UFUNCTION()
 	bool isStageCleared();
 
+private:
 	UPROPERTY(VisibleAnywhere)
 	bool ClearFlag;
+
+	UPROPERTY(VisibleAnywhere)
+	bool FailFlag;
+
 
 	UPROPERTY()
 	FTimerHandle PauseTimer;

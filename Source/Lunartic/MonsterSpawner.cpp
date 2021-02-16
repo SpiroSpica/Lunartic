@@ -48,8 +48,6 @@ void AMonsterSpawner::BeginPlay()
 	SpawnPoint->SetRelativeLocation(FVector(150, 0, 0));
 
 	GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &AMonsterSpawner::SpawnUnit, SpawnInterval, true);
-
-	
 }
 
 void AMonsterSpawner::SpawnUnit()

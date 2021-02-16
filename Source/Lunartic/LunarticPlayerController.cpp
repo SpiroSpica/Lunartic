@@ -101,12 +101,21 @@ void ALunarticPlayerController::PlayerTick(float DeltaTime)
 			GetWorldTimerManager().SetTimer(MemberTimerHandle, this, &ALunarticPlayerController::AttackLimit, ShootCooltime, false, Weapon[WeaponType].ShootInterval);
 		}
 	}
-	Hud->SetHP(MyCharacter->GetHP());
+	CharacterHP = MyCharacter->GetHP();
+
+	Hud->SetHP(CharacterHP);
+	if (!GameEndFlag && CharacterHP <= 0)
+	{
+		GameEndFlag = true;
+		GetWorldTimerManager().SetTimer(GameEndTimerHandle, this, &ALunarticPlayerController::FailGame, 2.0f, false);
+		GetWorld()->GetAuthGameMode<ALunarticGameMode>()->StageClear();
+	}
+
 
 	KillCount = MyCharacter->GetKillCount();
 	Hud->SetKillCount(KillCount);
 
-	if (!GameEndFlag && KillCount >= RequiredKill)
+	if (!GameEndFlag && KillCount >= RequiredKill && CharacterHP > 0)
 	{
 		GameEndFlag = true;
 		GetWorldTimerManager().SetTimer(GameEndTimerHandle, this, &ALunarticPlayerController::EndGame,2.0f,false);
@@ -129,6 +138,10 @@ void ALunarticPlayerController::BeginPlay()
 	KillCount = MyCharacter->GetKillCount();
 
 	GameEndFlag = false;
+
+	GameInstance = Cast<ULunarticGameInstance>(GetGameInstance());
+	
+	UE_LOG(LogTemp, Warning, TEXT("Current Level: %d"), GameInstance->GetLevel());
 }
 
 void ALunarticPlayerController::SetupInputComponent()
@@ -278,8 +291,7 @@ void ALunarticPlayerController::HitScan()
 	{
 		FString targetName;
 		target.GetActor()->GetName(targetName);
-		//target.GetActor->
-		UE_LOG(LogTemp, Log, TEXT("%s"),*targetName);
+
 		if (target.GetActor()->Tags.Contains("Enemy"))
 		{
 			ALunarticMonster* Monster = Cast<ALunarticMonster>(target.GetActor());
@@ -323,8 +335,7 @@ void ALunarticPlayerController::Shotgun()
 		{
 			FString targetName;
 			target.GetActor()->GetName(targetName);
-			//target.GetActor->
-			UE_LOG(LogTemp, Log, TEXT("%s"), *targetName);
+			
 			if (target.GetActor()->Tags.Contains("Enemy"))
 			{
 				ALunarticMonster* Monster = Cast<ALunarticMonster>(target.GetActor());
@@ -409,6 +420,7 @@ UInGameWidget* ALunarticPlayerController::GetHud() const
 
 void ALunarticPlayerController::Reload()
 {
+	MyCharacter->FireEffect(false);
 	ReloadFlag = true;
 	Hud->ReloadAlarm(true);
 	GetWorldTimerManager().SetTimer(ReloadTimerHandle, this, &ALunarticPlayerController::ReloadWeapon, ShootCooltime, false, Weapon[WeaponType].ReloadInterval);
@@ -431,5 +443,11 @@ void ALunarticPlayerController::OnEnemyKill(int Num)
 void ALunarticPlayerController::EndGame()
 {
 	Hud->BlurScreen(true);
+	SetPause(true);
+}
+
+void ALunarticPlayerController::FailGame()
+{
+	Hud->FailedScreen(true);
 	SetPause(true);
 }

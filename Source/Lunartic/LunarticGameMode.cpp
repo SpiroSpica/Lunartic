@@ -10,6 +10,7 @@
 ALunarticGameMode::ALunarticGameMode()
 {
 	ClearFlag = false;
+	FailFlag = false;
 	// use our custom PlayerController class
 	PlayerControllerClass = ALunarticPlayerController::StaticClass();
 
@@ -20,7 +21,6 @@ ALunarticGameMode::ALunarticGameMode()
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
-
 }
 
 

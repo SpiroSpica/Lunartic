@@ -9,6 +9,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
 #include "NiagaraSystemInstance.h"
+#include "GenericPlatform/GenericPlatformMath.h"
 #include "LunarticCharacter.generated.h"
 
 
