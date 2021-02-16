@@ -2,7 +2,6 @@
 
 
 #include "Enemy_Cannon.h"
-#include "LunarticMonsterController.h"
 
 // Sets default values
 AEnemy_Cannon::AEnemy_Cannon()
@@ -58,7 +57,7 @@ AEnemy_Cannon::AEnemy_Cannon()
 	GetCharacterMovement()->bUseControllerDesiredRotation = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 720.0f, 0.0f);
 
-	AIControllerClass = ALunarticMonsterController::StaticClass();
+	AIControllerClass = AEnemy_Cannon_Controller::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
 	HP = 200;

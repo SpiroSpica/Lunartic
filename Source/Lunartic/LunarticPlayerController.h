@@ -9,7 +9,9 @@
 #include "LunarticMonster.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "LunarticCharacter.h"
+#include "InGameWidget.h"
 #include "DrawDebugHelpers.h"
+#include "LunarticGameInstance.h"
 #include "LunarticPlayerController.generated.h"
 
 
@@ -27,18 +29,27 @@ struct FWeaponStatus
 	GENERATED_BODY()
 
 public:
+
+	//damage dealt to the enemy
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Damage;
 
+	//time between each shoot
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float ShootInterval;
 
+	//maximum number of ammo possible. gun will be reloaded to this number after reload
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 MaxAmmo;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 CurrentAmmo;
+
+	//time required to reload
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float ReloadInterval;
 
+	//1 = projectile, 2 = hitscan, 3 = artilery projectile, 4 = shotgun
 	uint8 WeaponStyle;
 };
 
@@ -52,13 +63,16 @@ class ALunarticPlayerController : public APlayerController
 public:
 	ALunarticPlayerController();
 
+	class UInGameWidget* GetHud() const;
+	ULunarticGameInstance* GameInstance;
+
 protected:
 
-	// Begin PlayerController interface
+	
 	virtual void PlayerTick(float DeltaTime) override;
 	virtual void SetupInputComponent() override;
 	virtual void BeginPlay() override;
-	// End PlayerController interface
+	
 
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
 	TSubclassOf<class AAProjectile> ProjectileClass;
@@ -81,25 +95,39 @@ protected:
 	UPROPERTY()
 	ALunarticCharacter* MyCharacter;
 
+	UPROPERTY(EditDefaultsOnly, BLueprintReadWrite, Category = UI)
+	TSubclassOf<class UInGameWidget> HudClass;
+
+
+private:
+
+	UPROPERTY()
+	class UInGameWidget* Hud;
+
+	UPROPERTY()
+	int CharacterHP;
+
 public:
 
+	//player movement function
 	UFUNCTION()
 	void UpDown(float NewAxisValue);
 	UFUNCTION()
 	void LeftRight(float NewAxisValue);
 
+	//player shooting function
 	UFUNCTION()
 	void Shoot();
-
 	UFUNCTION()
 	void ShootExplosive();
-	
 	UFUNCTION()
 	void HitScan();
-		
+	UFUNCTION()
+	void Shotgun();
+
+	//Shooting handle mechanism
 	UFUNCTION()
 	void StartShoot();
-
 	UFUNCTION()
 	void EndShoot();
 
@@ -112,8 +140,20 @@ public:
 	UFUNCTION()
 	void Bomb();
 
+	
 	UFUNCTION()
-	void Shotgun();
+	void Reload();
+	UFUNCTION()
+	void ReloadWeapon();
+
+	UFUNCTION()
+	void OnEnemyKill(int Num);
+
+	UFUNCTION()
+	void EndGame();
+
+	UFUNCTION()
+	void FailGame();
 
 	UPROPERTY(VisibleAnyWhere)
 	bool SpecialWeaponFlag;
@@ -124,7 +164,26 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Timer)
 	FTimerHandle MemberTimerHandle;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Timer)
+	FTimerHandle ReloadTimerHandle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Timer)
+	FTimerHandle GameEndTimerHandle;
+
+	UPROPERTY(VisibleAnyWhere)
+	bool ReloadFlag;
+
+	UPROPERTY(VisibleAnyWhere)
+	bool GameEndFlag;
+
 	UPROPERTY(VisibleAnyWhere)
 	int WeaponType;
+
+	UPROPERTY(VisibleAnyWhere)
+	int KillCount;
+
+	UPROPERTY(VisibleAnywhere)
+	int RequiredKill;
+
 };
 

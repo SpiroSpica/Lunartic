@@ -13,6 +13,7 @@
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Components/CapsuleComponent.h"
+#include "Enemy_Cannon_Controller.h"
 #include "Enemy_Cannon.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnAttackEndDelegate);
@@ -54,7 +55,7 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	bool OnAttack;
 	
-
+	
 	FOnAttackEndDelegate OnAttackEnd;
 
 	UPROPERTY()

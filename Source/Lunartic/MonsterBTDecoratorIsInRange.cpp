@@ -11,6 +11,7 @@ UMonsterBTDecoratorIsInRange::UMonsterBTDecoratorIsInRange()
 {
 	NodeName = TEXT("CanAttack");
 	UE_LOG(LogTemp, Warning, TEXT("Generated"));
+	Distance = 400.0f;
 }
 
 bool UMonsterBTDecoratorIsInRange::CalculateRawConditionValue(UBehaviorTreeComponent &OwnerComp, uint8* NodeMemory) const
@@ -31,12 +32,8 @@ bool UMonsterBTDecoratorIsInRange::CalculateRawConditionValue(UBehaviorTreeCompo
 		return false;
 	}
 
-	bResult = Target->GetDistanceTo(ControllingPawn) <= 400.0f;
+	bResult = Target->GetDistanceTo(ControllingPawn) <= Distance;
 
-	if (bResult)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("AttackAllowed"));
-	}
 	return bResult;
 	
 }

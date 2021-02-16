@@ -3,6 +3,7 @@
 #include "LunarticPlayerController.h"
 #include "Runtime/Engine/Classes/Components/DecalComponent.h"
 #include "LunarticCharacter.h"
+
 #include "Engine/World.h"
 
 ALunarticPlayerController::ALunarticPlayerController()
@@ -11,6 +12,7 @@ ALunarticPlayerController::ALunarticPlayerController()
 	isFire = false;
 	notShooting = true;
 	SpecialWeaponFlag = false;
+	ReloadFlag = false;
 	DefaultMouseCursor = EMouseCursor::Crosshairs;
 	WeaponType = 1;
 	ShootCooltime = 1.0f;
@@ -20,24 +22,28 @@ ALunarticPlayerController::ALunarticPlayerController()
 	tmp1.ShootInterval = 0.1;
 	tmp1.ReloadInterval = 2;
 	tmp1.MaxAmmo = 40;
+	tmp1.CurrentAmmo = 40;
 	tmp1.WeaponStyle = 1;
 
 	tmp2.Damage = 5;
 	tmp2.ShootInterval = 0.03;
 	tmp2.ReloadInterval = 5;
 	tmp2.MaxAmmo = 200;
+	tmp2.CurrentAmmo = 200;
 	tmp2.WeaponStyle = 2;
 
 	tmp3.Damage = 70;
 	tmp3.ShootInterval = 1;
 	tmp3.ReloadInterval = 3;
 	tmp3.MaxAmmo = 3;
+	tmp3.CurrentAmmo = 3;
 	tmp3.WeaponStyle = 3;
 
 	tmp4.Damage = 3;
 	tmp4.ShootInterval = 0.3;
 	tmp4.ReloadInterval = 2;
 	tmp4.MaxAmmo = 5;
+	tmp4.CurrentAmmo = 5;
 	tmp4.WeaponStyle = 4;
 
 	Weapon.Emplace(tmp1);
@@ -46,33 +52,74 @@ ALunarticPlayerController::ALunarticPlayerController()
 	Weapon.Emplace(tmp4);
 	
 
+	RequiredKill = 40;
+
+	static ConstructorHelpers::FClassFinder<UInGameWidget> UI_HUD(TEXT("WidgetBlueprint'/Game/UI/InGameWidget_BP.InGameWidget_BP_C'"));
+	if (UI_HUD.Succeeded())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UI_HUD implemnted"));
+		HudClass = UI_HUD.Class;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UI_HUD failed"));
+	}
 }
 
 void ALunarticPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
 
-	if (isFire && notShooting && !SpecialWeaponFlag)
+	if (isFire && notShooting && !SpecialWeaponFlag && !ReloadFlag)
 	{
-		switch (Weapon[WeaponType].WeaponStyle)
+		if (Weapon[WeaponType].CurrentAmmo <= 0)
 		{
-		case 1:
-			Shoot();
-			MyCharacter->FireEffect(true);
-			break;
-		case 2:
-			HitScan();
-			MyCharacter->FireEffect(true);
-			break;
-		case 3:
-			ShootExplosive();
-			break;
-		case 4:
-			Shotgun();
-			MyCharacter->FireEffect(true);
-			break;
+			Reload();
 		}
-		GetWorldTimerManager().SetTimer(MemberTimerHandle, this, &ALunarticPlayerController::AttackLimit, ShootCooltime, false, Weapon[WeaponType].ShootInterval);
+		else
+		{
+			Weapon[WeaponType].CurrentAmmo -= 1;
+			Hud->SetWeaponStatus(WeaponType, Weapon[WeaponType].CurrentAmmo, Weapon[WeaponType].MaxAmmo);
+			switch (Weapon[WeaponType].WeaponStyle)
+			{
+			case 1:
+				Shoot();
+				MyCharacter->FireEffect(true);
+				break;
+			case 2:
+				HitScan();
+				MyCharacter->FireEffect(true);
+				break;
+			case 3:
+				ShootExplosive();
+				break;
+			case 4:
+				Shotgun();
+				MyCharacter->FireEffect(true);
+				break;
+			}
+			GetWorldTimerManager().SetTimer(MemberTimerHandle, this, &ALunarticPlayerController::AttackLimit, ShootCooltime, false, Weapon[WeaponType].ShootInterval);
+		}
+	}
+	CharacterHP = MyCharacter->GetHP();
+
+	Hud->SetHP(CharacterHP);
+	if (!GameEndFlag && CharacterHP <= 0)
+	{
+		GameEndFlag = true;
+		GetWorldTimerManager().SetTimer(GameEndTimerHandle, this, &ALunarticPlayerController::FailGame, 2.0f, false);
+		GetWorld()->GetAuthGameMode<ALunarticGameMode>()->StageClear();
+	}
+
+
+	KillCount = MyCharacter->GetKillCount();
+	Hud->SetKillCount(KillCount);
+
+	if (!GameEndFlag && KillCount >= RequiredKill && CharacterHP > 0)
+	{
+		GameEndFlag = true;
+		GetWorldTimerManager().SetTimer(GameEndTimerHandle, this, &ALunarticPlayerController::EndGame,2.0f,false);
+		GetWorld()->GetAuthGameMode<ALunarticGameMode>()->StageClear();
 	}
 }
 
@@ -80,6 +127,21 @@ void ALunarticPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 	MyCharacter = Cast<ALunarticCharacter>(GetCharacter());
+
+	Hud = CreateWidget<UInGameWidget>(this, HudClass);
+	Hud->AddToViewport();
+	Hud->SetKillCount(0);
+	Hud->SetHP(MyCharacter->HP);
+	Hud->SetWeaponStatus(WeaponType, Weapon[WeaponType].CurrentAmmo, Weapon[WeaponType].MaxAmmo);
+	Hud->ReloadAlarm(false);
+
+	KillCount = MyCharacter->GetKillCount();
+
+	GameEndFlag = false;
+
+	GameInstance = Cast<ULunarticGameInstance>(GetGameInstance());
+	
+	UE_LOG(LogTemp, Warning, TEXT("Current Level: %d"), GameInstance->GetLevel());
 }
 
 void ALunarticPlayerController::SetupInputComponent()
@@ -98,7 +160,8 @@ void ALunarticPlayerController::SetupInputComponent()
 	InputComponent->BindAction<FCustomIntDelegate>("WeaponChange2", IE_Pressed, this, &ALunarticPlayerController::WeaponChange, 1);
 	InputComponent->BindAction<FCustomIntDelegate>("WeaponChange3", IE_Pressed, this, &ALunarticPlayerController::WeaponChange, 2);
 	InputComponent->BindAction<FCustomIntDelegate>("WeaponChange4", IE_Pressed, this, &ALunarticPlayerController::WeaponChange, 3);
-	
+	InputComponent->BindAction("WeaponReload", IE_Pressed, this, &ALunarticPlayerController::Reload);
+
 	InputComponent->BindAxis(TEXT("MoveForWard"), this, &ALunarticPlayerController::UpDown);
 	InputComponent->BindAxis(TEXT("MoveRight"), this, &ALunarticPlayerController::LeftRight);
 	
@@ -171,7 +234,12 @@ void ALunarticPlayerController::Bomb()
 
 void ALunarticPlayerController::WeaponChange(int type)
 {
+	GetWorld()->GetTimerManager().ClearTimer(ReloadTimerHandle);
+	Hud->ReloadAlarm(false);
+	ReloadFlag = false;
 	WeaponType = type;
+	Hud->SetWeaponStatus(WeaponType, Weapon[WeaponType].CurrentAmmo, Weapon[WeaponType].MaxAmmo);
+	
 }
 
 void ALunarticPlayerController::UpDown(float NewAxisValue)
@@ -211,7 +279,7 @@ void ALunarticPlayerController::HitScan()
 	//add rebound from shooting by adding Random value to Yaw
 
 	FVector end = start + (MyCharacter->GetActorRotation() + FRotator(RandomValRoll, RandomValPitch, 0)).Vector() * 10000.0f;
-	//FVector end = start + MyCharacter->GetActorRotation().Vector() * 10000.0f;
+	
 	FCollisionQueryParams collisionParams;
 	collisionParams.bTraceComplex = true;
 	collisionParams.bDebugQuery = true;
@@ -223,8 +291,7 @@ void ALunarticPlayerController::HitScan()
 	{
 		FString targetName;
 		target.GetActor()->GetName(targetName);
-		//target.GetActor->
-		UE_LOG(LogTemp, Log, TEXT("%s"),*targetName);
+
 		if (target.GetActor()->Tags.Contains("Enemy"))
 		{
 			ALunarticMonster* Monster = Cast<ALunarticMonster>(target.GetActor());
@@ -268,8 +335,7 @@ void ALunarticPlayerController::Shotgun()
 		{
 			FString targetName;
 			target.GetActor()->GetName(targetName);
-			//target.GetActor->
-			UE_LOG(LogTemp, Log, TEXT("%s"), *targetName);
+			
 			if (target.GetActor()->Tags.Contains("Enemy"))
 			{
 				ALunarticMonster* Monster = Cast<ALunarticMonster>(target.GetActor());
@@ -344,4 +410,44 @@ void ALunarticPlayerController::ShootExplosive()
 void ALunarticPlayerController::AttackLimit()
 {
 	notShooting = true;
+}
+
+
+UInGameWidget* ALunarticPlayerController::GetHud() const
+{
+	return Hud;
+}
+
+void ALunarticPlayerController::Reload()
+{
+	MyCharacter->FireEffect(false);
+	ReloadFlag = true;
+	Hud->ReloadAlarm(true);
+	GetWorldTimerManager().SetTimer(ReloadTimerHandle, this, &ALunarticPlayerController::ReloadWeapon, ShootCooltime, false, Weapon[WeaponType].ReloadInterval);
+}
+
+void ALunarticPlayerController::ReloadWeapon()
+{
+	Weapon[WeaponType].CurrentAmmo = Weapon[WeaponType].MaxAmmo;
+	Hud->SetWeaponStatus(WeaponType, Weapon[WeaponType].CurrentAmmo, Weapon[WeaponType].MaxAmmo);
+	ReloadFlag = false;
+	Hud->ReloadAlarm(false);
+}
+
+
+void ALunarticPlayerController::OnEnemyKill(int Num)
+{
+	Hud->SetKillCount(Num);
+}
+
+void ALunarticPlayerController::EndGame()
+{
+	Hud->BlurScreen(true);
+	SetPause(true);
+}
+
+void ALunarticPlayerController::FailGame()
+{
+	Hud->FailedScreen(true);
+	SetPause(true);
 }

@@ -9,6 +9,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
 #include "NiagaraSystemInstance.h"
+#include "GenericPlatform/GenericPlatformMath.h"
 #include "LunarticCharacter.generated.h"
 
 
@@ -34,6 +35,9 @@ public:
 
 	UPROPERTY()
 	int EnemyCount;
+	UPROPERTY()
+	int RequiredKill;
+
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	int HP;
@@ -43,6 +47,12 @@ public:
 
 	UFUNCTION()
 	void OnTakeDamage(int Damage);
+
+	UFUNCTION()
+	int GetHP();
+
+	UFUNCTION()
+	int GetKillCount();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UStaticMeshComponent* Outfit;

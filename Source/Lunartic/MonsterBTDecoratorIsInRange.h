@@ -18,6 +18,9 @@ class LUNARTIC_API UMonsterBTDecoratorIsInRange : public UBTDecorator
 public:
 	UMonsterBTDecoratorIsInRange();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Distance;
+
 protected:
 	virtual bool CalculateRawConditionValue(UBehaviorTreeComponent &OwnerComp, uint8* NodeMemory) const override;
 };

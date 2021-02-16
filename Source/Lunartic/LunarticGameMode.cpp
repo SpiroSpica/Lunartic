@@ -4,11 +4,13 @@
 #include "LunarticPlayerController.h"
 #include "LunarticCharacter.h"
 #include "MonsterSpawner.h"
+
 #include "UObject/ConstructorHelpers.h"
 
 ALunarticGameMode::ALunarticGameMode()
 {
 	ClearFlag = false;
+	FailFlag = false;
 	// use our custom PlayerController class
 	PlayerControllerClass = ALunarticPlayerController::StaticClass();
 
@@ -21,14 +23,10 @@ ALunarticGameMode::ALunarticGameMode()
 	}
 }
 
+
 void ALunarticGameMode::StageClear()
 {
 	ClearFlag = true;
-	APlayerController* const MyPlayer = Cast<APlayerController>(GEngine->GetFirstLocalPlayerController(GetWorld()));
-	if (MyPlayer != NULL)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Should be paused"));
-	}
 }
 
 bool ALunarticGameMode::isStageCleared()
