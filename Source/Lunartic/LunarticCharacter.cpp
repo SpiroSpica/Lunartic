@@ -48,6 +48,11 @@ ALunarticCharacter::ALunarticCharacter()
 		Outfit->SetStaticMesh(StaticMesh.Object);
 	}
 
+	/* Character's rotation is based on location of mouse pointer, not movement*/
+	GetCharacterMovement()->bOrientRotationToMovement = false;
+
+
+	//setup niagara effect to the character
 	Outfit->SetupAttachment(RootComponent);
 	HoverFL = CreateDefaultSubobject<UNiagaraComponent>("Hover1");
 	HoverFL->SetupAttachment(Outfit);
@@ -83,9 +88,12 @@ ALunarticCharacter::ALunarticCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
 
-
+	/* Enemy Count is initialized to zero and currently needs 30 to move to next stage*/
+	/* Value of Required kill should be changeable*/
 	EnemyCount = 0;
 	RequiredKill = 30;
+
+	/*player hp*/
 	HP = 200;
 
 	PastRotationYaw = 0;
@@ -95,7 +103,8 @@ void ALunarticCharacter::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
 
-	GetCharacterMovement()->bOrientRotationToMovement = false;
+	/* Adjust Rotation of the character*/
+	/* Get Location of mouse pointer, calculate relative rotation between character and mouse pointer, change direction of character based to it*/
 	if (CursorToWorld != nullptr)
 	{
 		if (APlayerController* PC = Cast<APlayerController>(GetController()))
@@ -114,8 +123,11 @@ void ALunarticCharacter::Tick(float DeltaSeconds)
 		}
 	}
 
+	/* Adjust Niagara Effect (Hovering Direction Fire)*/
+	/* Find out rotation change and adjust hovering fire effect based on it*/
 	float CurrentYaw = GetActorRotation().Yaw;
-
+	PastRotationYaw = CurrentYaw;
+		
 	if (PastRotationYaw < CurrentYaw) 
 	{
 		HoverFL->Deactivate();
@@ -137,7 +149,7 @@ void ALunarticCharacter::Tick(float DeltaSeconds)
 		HoverBL->Deactivate();
 		HoverBR->Deactivate();
 	}
-	PastRotationYaw = CurrentYaw;
+	
 }
 
 void ALunarticCharacter::BeginPlay()
@@ -148,19 +160,21 @@ void ALunarticCharacter::BeginPlay()
 	HoverFR->Deactivate();
 	HoverBL->Deactivate();
 	HoverBR->Deactivate();
-
 }
 
+/* Calculate Enemy Kill Count by character*/
 void ALunarticCharacter::OnEnemyKill()
 {
 	EnemyCount++;
 }
 
+/* Calculate HP when damaged, HP cannot be below 0 */
 void ALunarticCharacter::OnTakeDamage(int Damage)
 {
 	HP = FGenericPlatformMath::Max(0, HP - Damage);
 }
 
+/* De/Activate Niagra Effect (Shooting) */
 void ALunarticCharacter::FireEffect(bool firing)
 {
 	if (firing)
@@ -173,11 +187,13 @@ void ALunarticCharacter::FireEffect(bool firing)
 	}
 }
 
+/* Return HP of character int value */
 int ALunarticCharacter::GetHP()
 {
 	return HP;
 }
 
+/* Return enemy kill count int value */
 int ALunarticCharacter::GetKillCount()
 {
 	return EnemyCount;

@@ -19,11 +19,11 @@ public:
 	UCannonAttack();
 
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
-
 	
 protected:
 	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 
 private:
+	/* flag to know if cannon's attack procedure has started or not */
 	bool IsAttacking = false;
 };

@@ -28,7 +28,10 @@ public:
 	TArray<ALunarticMonster*> UnitSave;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UClass* UnitToSpawn;
+	UClass* UnitFlame;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UClass* UnitCannon;
 
 	UPROPERTY()
 	float SpawnInterval;
@@ -46,7 +49,7 @@ public:
 	void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	UFUNCTION()
-	void StageClear();
+	void StageClear(bool Succeeded);
 
 protected:
 	// Called when the game starts or when spawned
@@ -55,5 +58,9 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+private:
+
+	int StageLevel;
 
 };

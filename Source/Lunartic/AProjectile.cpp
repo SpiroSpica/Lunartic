@@ -7,23 +7,22 @@
 AAProjectile::AAProjectile()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	if (!RootComponent)
 	{
 		RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("PorjectileSceneComponent"));
 	}
-
+	/* Add collision sphere and attach to root */
 	if (!CollisionComponent)
 	{
 		CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
 		CollisionComponent->InitSphereRadius(15.0f);
 		CollisionComponent->SetCollisionProfileName(TEXT("Bullet"));
-
 		RootComponent = CollisionComponent;
 	}
 
-
+	/* Basic setups for overall projectile movement component setting*/
 	if (!ProjectileMovementComponent)
 	{
 		ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
@@ -36,6 +35,7 @@ AAProjectile::AAProjectile()
 		ProjectileMovementComponent->ProjectileGravityScale = 0.0f;
 	}
 
+	/* add mesh to projectile*/
 	if (!ProjectileMeshComponent)
 	{
 		ProjectileMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ProjectileMeshComponent"));
@@ -58,10 +58,8 @@ AAProjectile::AAProjectile()
 	ProjectileMeshComponent->SetMaterial(0, ProjectileMaterialInstance);
 	ProjectileMeshComponent->SetRelativeScale3D(FVector(0.09f, 0.09f, 0.09f));
 	ProjectileMeshComponent->SetupAttachment(RootComponent);
-
 	
 	CollisionComponent->OnComponentHit.AddDynamic(this, &AAProjectile::OnHit);
-
 }
 
 // Called when the game starts or when spawned
@@ -69,33 +67,30 @@ void AAProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 
+	/* projectile disappears in 5 seconds after it is spawned if not trigger hit event*/
 	SetLifeSpan(5);
 }
 
-
-// Called every frame
-void AAProjectile::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
+/* Set direction of projectile */
 void AAProjectile::FireInDirection(const FVector& ShootDirection) 
 {
 	AAProjectile::ProjectileMovementComponent->Velocity = ShootDirection * ProjectileMovementComponent->InitialSpeed;
 }
 
+/* Set event when projectile collide with other thing*/
 void AAProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
-	
 	if (Hit.GetActor()->Tags.Contains("Enemy"))
 	{
-		
 		ALunarticMonster* Target = Cast<ALunarticMonster>(Hit.GetActor());
 		Target->OnTakeDamage(Damage);
-		
-		
 	}
-	SetLifeSpan(0.01f);
-	
+	Destroy();	
 }
+
+/* Set Damage that projectile can give */
+void AAProjectile::SetDamage(int Dmg)
+{
+	Damage = Dmg;
+}
+

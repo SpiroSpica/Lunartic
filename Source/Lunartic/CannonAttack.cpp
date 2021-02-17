@@ -8,6 +8,8 @@
 UCannonAttack::UCannonAttack()
 {
 	bNotifyTick = true;
+
+	/* flag to know if cannon's attack procedure has started or not */
 	IsAttacking = false;
 }
 
@@ -22,6 +24,7 @@ EBTNodeResult::Type UCannonAttack::ExecuteTask(UBehaviorTreeComponent& OwnerComp
 		EBTNodeResult::Failed;
 	}
 
+	/* If Cannon can attack, initiate attack procedure with flag on. Add broadcast that catches the end of attack procedrue*/
 	if (Chara->AttackAvailable())
 	{
 		IsAttacking = true;
@@ -40,6 +43,7 @@ void UCannonAttack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemor
 {
 	UBTTaskNode::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
 
+	/* if flag turned off after the attack, tells behavior tree that the procedure has ended*/
 	if (!IsAttacking)
 	{
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);

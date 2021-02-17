@@ -31,10 +31,16 @@ AMonsterSpawner::AMonsterSpawner()
 
 	SpawnPoint->SetRelativeScale3D(FVector(0.5, 0.5, 0.5));
 
-	static ConstructorHelpers::FObjectFinder<UBlueprint> Unit(TEXT("Blueprint'/Game/Enemy/FlameThrower/Enemy_FlameThrower_BP.Enemy_FlameThrower_BP'"));
-	if (Unit.Object != nullptr)
+	static ConstructorHelpers::FObjectFinder<UBlueprint> UnitF(TEXT("Blueprint'/Game/Enemy/FlameThrower/Enemy_FlameThrower_BP.Enemy_FlameThrower_BP'"));
+	if (UnitF.Object != nullptr)
 	{
-		UnitToSpawn = (UClass*)Unit.Object->GeneratedClass;
+		UnitFlame = (UClass*)UnitF.Object->GeneratedClass;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UBlueprint> UnitC(TEXT("Blueprint'/Game/Enemy/Cannon/Enemy_Cannon_BP.Enemy_Cannon_BP'"));
+	if (UnitC.Object != nullptr)
+	{
+		UnitCannon = (UClass*)UnitC.Object->GeneratedClass;
 	}
 }
 
@@ -53,7 +59,7 @@ void AMonsterSpawner::BeginPlay()
 void AMonsterSpawner::SpawnUnit()
 {
 	FVector SpawnLocation = SpawnPoint->GetComponentLocation();
-	ALunarticMonster* tmp = Cast<ALunarticMonster>(GetWorld()->SpawnActor(UnitToSpawn, &SpawnLocation));
+	ALunarticMonster* tmp = Cast<ALunarticMonster>(GetWorld()->SpawnActor(UnitFlame, &SpawnLocation));
 	UnitSave.Emplace(tmp);
 }
 
@@ -70,21 +76,25 @@ void AMonsterSpawner::Tick(float DeltaTime)
 	
 	if (isGameRunning && GetWorld()->GetAuthGameMode<ALunarticGameMode>()->isStageCleared())
 	{
+
 		isGameRunning = false;
-		StageClear();
+		StageClear(GetWorld()->GetAuthGameMode<ALunarticGameMode>()->isSucceeded());
 	}
 }
 
-void AMonsterSpawner::StageClear()
+void AMonsterSpawner::StageClear(bool Succeeded)
 {
-	for (int i = 0; i < UnitSave.Num(); i++)
+	if (Succeeded)
 	{
-		if (UnitSave[i] != nullptr)
+		for (int i = 0; i < UnitSave.Num(); i++)
 		{
-			UnitSave[i]->Destroy();
+			if (UnitSave[i] != nullptr)
+			{
+				UnitSave[i]->Destroy();
+			}
 		}
 	}
+	
 	GetWorld()->GetTimerManager().ClearTimer(SpawnTimerHandle);
-
 }
 

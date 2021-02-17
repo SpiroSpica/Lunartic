@@ -24,12 +24,18 @@ ALunarticGameMode::ALunarticGameMode()
 }
 
 
-void ALunarticGameMode::StageClear()
+void ALunarticGameMode::StageClear(bool Clear)
 {
 	ClearFlag = true;
+	FailFlag = Clear;
 }
 
 bool ALunarticGameMode::isStageCleared()
 {
 	return ClearFlag;
+}
+
+bool ALunarticGameMode::isSucceeded()
+{
+	return FailFlag;
 }

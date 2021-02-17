@@ -18,30 +18,38 @@ public:
 	// Sets default values for this actor's properties
 	AAProjectile();
 
-	
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 	
+	/* Set direction of projectile */
+	UFUNCTION()
+	void FireInDirection(const FVector& ShootDireciton);
+
+	/* Set event when projectile collide with other thing*/
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
+
+	/* Set Damage that projectile can give */
+	UFUNCTION()
+	void SetDamage(int Dmg);
+
+private:
+
+	/* 
+	Component that forms projectile
+		CollisionComponent : Collide
+		ProjectileMovementComponent : Controls projectile movement
+		ProjectileMeshComponent : Mesh Component for projectile appearance
+		ProjectileMaterialInstance : Material for mesh 
+	*/
 	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
 	USphereComponent* CollisionComponent;
 
 	UPROPERTY(VisibleAnywhere, Category = Movement)
 	UProjectileMovementComponent* ProjectileMovementComponent;
-
-	UPROPERTY(VisibleAnywhere)
-	int Damage;
-
-	UFUNCTION()
-	void FireInDirection(const FVector& ShootDireciton);
-
-	UFUNCTION()
-	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
 	UStaticMeshComponent* ProjectileMeshComponent;
@@ -49,4 +57,7 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, Category = Movement)
 	UMaterialInstanceDynamic* ProjectileMaterialInstance;
 
+	/* Damage that projectile can give */
+	UPROPERTY(VisibleAnywhere)
+	int Damage;
 };

@@ -17,10 +17,13 @@ public:
 	ALunarticGameMode();
 
 	UFUNCTION()
-	void StageClear();
+	void StageClear(bool Clear);
 
 	UFUNCTION()
 	bool isStageCleared();
+
+	UFUNCTION()
+	bool isSucceeded();
 
 private:
 	UPROPERTY(VisibleAnywhere)
