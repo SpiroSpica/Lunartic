@@ -33,27 +33,7 @@ public:
 	/** Returns CursorToWorld subobject **/
 	FORCEINLINE class UDecalComponent* GetCursorToWorld() { return CursorToWorld; }
 
-	UPROPERTY()
-	int EnemyCount;
-	UPROPERTY()
-	int RequiredKill;
-
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	int HP;
-	
-	UFUNCTION()
-	void OnEnemyKill();
-
-	UFUNCTION()
-	void OnTakeDamage(int Damage);
-
-	UFUNCTION()
-	int GetHP();
-
-	UFUNCTION()
-	int GetKillCount();
-
+	/* major appearance of character */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UStaticMeshComponent* Outfit;
 
@@ -75,11 +55,28 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UNiagaraComponent* HoverSmoke;
 
-	UPROPERTY()
-	float PastRotationYaw;
-
+	/* De/Activate Niagra Effect (Shooting) */
 	UFUNCTION()
 	void FireEffect(bool firing);
+	
+	/* Calculate Enemy Kill Count by character*/
+	UFUNCTION()
+	void OnEnemyKill();
+
+	/* Calculate HP when damaged, HP cannot be below 0 */
+	UFUNCTION()
+	void OnTakeDamage(int Damage);
+
+	/* Return HP of character int value */
+	UFUNCTION()
+	int GetHP();
+
+	/* Return enemy kill count int value */
+	UFUNCTION()
+	int GetKillCount();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	int HP;
 
 private:
 	/** Top down camera */
@@ -94,6 +91,15 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UDecalComponent* CursorToWorld;
 	
+	/* counts number of enemies killed*/
+	UPROPERTY()
+	int EnemyCount;
+	/* number of enemies required to kill to move to next stage*/
+	UPROPERTY()
+	int RequiredKill;
+	/* float used to check the direction of character rotates */
+	UPROPERTY()
+	float PastRotationYaw;
 	
 };
 

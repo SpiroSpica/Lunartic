@@ -8,6 +8,7 @@
 
 ALunarticPlayerController::ALunarticPlayerController()
 {
+	//inital setting
 	bShowMouseCursor = true;
 	isFire = false;
 	notShooting = true;
@@ -16,6 +17,8 @@ ALunarticPlayerController::ALunarticPlayerController()
 	DefaultMouseCursor = EMouseCursor::Crosshairs;
 	WeaponType = 1;
 	ShootCooltime = 1.0f;
+
+	//data input of weapons. It would be nice to change as reading data from outside if time allows
 
 	FWeaponStatus tmp1, tmp2, tmp3, tmp4;
 	tmp1.Damage = 10;
@@ -108,7 +111,7 @@ void ALunarticPlayerController::PlayerTick(float DeltaTime)
 	{
 		GameEndFlag = true;
 		GetWorldTimerManager().SetTimer(GameEndTimerHandle, this, &ALunarticPlayerController::FailGame, 2.0f, false);
-		GetWorld()->GetAuthGameMode<ALunarticGameMode>()->StageClear();
+		GetWorld()->GetAuthGameMode<ALunarticGameMode>()->StageClear(false);
 	}
 
 
@@ -119,7 +122,7 @@ void ALunarticPlayerController::PlayerTick(float DeltaTime)
 	{
 		GameEndFlag = true;
 		GetWorldTimerManager().SetTimer(GameEndTimerHandle, this, &ALunarticPlayerController::EndGame,2.0f,false);
-		GetWorld()->GetAuthGameMode<ALunarticGameMode>()->StageClear();
+		GetWorld()->GetAuthGameMode<ALunarticGameMode>()->StageClear(true);
 	}
 }
 
@@ -370,7 +373,7 @@ void ALunarticPlayerController::Shoot()
 		{
 			FVector LaunchDirection = MuzzleRotation.Vector();
 			Projectile->FireInDirection(LaunchDirection);
-			Projectile->Damage = Weapon[WeaponType].Damage;
+			Projectile->SetDamage(Weapon[WeaponType].Damage);
 		}
 	}
 	

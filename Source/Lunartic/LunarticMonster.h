@@ -8,6 +8,7 @@
 #include "LunarticCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/CapsuleComponent.h"
+#include "GenericPlatform/GenericPlatformMath.h"
 #include "LunarticMonster.generated.h"
 
 UCLASS(Blueprintable)
