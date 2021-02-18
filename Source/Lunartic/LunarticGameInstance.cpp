@@ -5,7 +5,7 @@
 
 ULunarticGameInstance::ULunarticGameInstance()
 {
-	Level = 31;
+	Level = 1;
 
 	UE_LOG(LogTemp, Warning, TEXT("GameInstance Constructor"));
 }

@@ -7,6 +7,8 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "LunarticMonster.h"
 #include "LunarticGameMode.h"
+#include "LunarticGameInstance.h"
+#include "Math/UnrealMathUtility.h"
 #include "MonsterSpawner.generated.h"
 
 UCLASS()
@@ -28,6 +30,9 @@ public:
 	TArray<ALunarticMonster*> UnitSave;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<UClass*> UnitToSpawn;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UClass* UnitFlame;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -46,9 +51,6 @@ public:
 	void SpawnUnit();
 
 	UFUNCTION()
-	void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
-	UFUNCTION()
 	void StageClear(bool Succeeded);
 
 protected:
@@ -62,5 +64,6 @@ public:
 private:
 
 	int StageLevel;
+	ULunarticGameInstance* GameInstance;
 
 };

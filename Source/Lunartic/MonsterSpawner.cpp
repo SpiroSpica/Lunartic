@@ -20,7 +20,6 @@ AMonsterSpawner::AMonsterSpawner()
 	if (MeshAsset.Object != nullptr)
 	{
 		BuildingMesh->SetStaticMesh(MeshAsset.Object);
-		//BuildingMesh->SetCollisionProfileName(UCollisionProfile::Pawn_ProfileName);
 	}
 
 	auto ParticleSystem = ConstructorHelpers::FObjectFinder<UParticleSystem>(TEXT("ParticleSystem'/Engine/Tutorial/SubEditors/TutorialAssets/TutorialParticleSystem.TutorialParticleSystem'"));
@@ -35,12 +34,14 @@ AMonsterSpawner::AMonsterSpawner()
 	if (UnitF.Object != nullptr)
 	{
 		UnitFlame = (UClass*)UnitF.Object->GeneratedClass;
+		UnitToSpawn.Emplace((UClass*)UnitF.Object->GeneratedClass);
 	}
 
 	static ConstructorHelpers::FObjectFinder<UBlueprint> UnitC(TEXT("Blueprint'/Game/Enemy/Cannon/Enemy_Cannon_BP.Enemy_Cannon_BP'"));
 	if (UnitC.Object != nullptr)
 	{
 		UnitCannon = (UClass*)UnitC.Object->GeneratedClass;
+		UnitToSpawn.Emplace((UClass*)UnitC.Object->GeneratedClass);
 	}
 }
 
@@ -52,21 +53,37 @@ void AMonsterSpawner::BeginPlay()
 	RootComponent = BuildingMesh;
 	SpawnPoint->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	SpawnPoint->SetRelativeLocation(FVector(150, 0, 0));
+	
+	GameInstance = Cast<ULunarticGameInstance>(GetGameInstance());
+	StageLevel = GameInstance->GetLevel();
+	SpawnInterval = 1 / (FGenericPlatformMath::LogX(10, ((StageLevel + 1))));
 
+	
+	UE_LOG(LogTemp, Warning, TEXT("Current Spawn Interval: %f"), SpawnInterval);
 	GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &AMonsterSpawner::SpawnUnit, SpawnInterval, true);
 }
 
+/* Spawn Unit and save unit at Unitsave list for later control */
 void AMonsterSpawner::SpawnUnit()
 {
 	FVector SpawnLocation = SpawnPoint->GetComponentLocation();
-	ALunarticMonster* tmp = Cast<ALunarticMonster>(GetWorld()->SpawnActor(UnitFlame, &SpawnLocation));
+	float decide = FMath::RandRange(1, 100);
+
+	ALunarticMonster* tmp;
+
+	if(decide / StageLevel > 1)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("0"));
+		tmp = Cast<ALunarticMonster>(GetWorld()->SpawnActor(UnitToSpawn[0], &SpawnLocation));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("1"));
+		tmp = Cast<ALunarticMonster>(GetWorld()->SpawnActor(UnitToSpawn[1], &SpawnLocation));
+	}
+
+	
 	UnitSave.Emplace(tmp);
-}
-
-
-void AMonsterSpawner::EndPlay(const EEndPlayReason::Type EndPlayReason)
-{
-	Super::EndPlay(EndPlayReason);
 }
 
 // Called every frame
@@ -82,6 +99,7 @@ void AMonsterSpawner::Tick(float DeltaTime)
 	}
 }
 
+/* Called when stage clear, remove monster actor spawnwed */
 void AMonsterSpawner::StageClear(bool Succeeded)
 {
 	if (Succeeded)

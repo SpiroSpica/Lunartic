@@ -57,7 +57,7 @@ void AEnemy_FlameThrower::BeginPlay()
 
 	Flame1->Deactivate();
 	Flame2->Deactivate();
-	HP = 200;
+	HP = 50;
 }
 
 void AEnemy_FlameThrower::Tick(float DeltaTime)
