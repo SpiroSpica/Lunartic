@@ -22,12 +22,6 @@ AMonsterSpawner::AMonsterSpawner()
 		BuildingMesh->SetStaticMesh(MeshAsset.Object);
 	}
 
-	auto ParticleSystem = ConstructorHelpers::FObjectFinder<UParticleSystem>(TEXT("ParticleSystem'/Engine/Tutorial/SubEditors/TutorialAssets/TutorialParticleSystem.TutorialParticleSystem'"));
-	if (ParticleSystem.Object != nullptr)
-	{
-		SpawnPoint->SetTemplate(ParticleSystem.Object);
-	}
-
 	SpawnPoint->SetRelativeScale3D(FVector(0.5, 0.5, 0.5));
 
 	static ConstructorHelpers::FObjectFinder<UBlueprint> UnitF(TEXT("Blueprint'/Game/Enemy/FlameThrower/Enemy_FlameThrower_BP.Enemy_FlameThrower_BP'"));
@@ -52,7 +46,7 @@ void AMonsterSpawner::BeginPlay()
 
 	RootComponent = BuildingMesh;
 	SpawnPoint->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
-	SpawnPoint->SetRelativeLocation(FVector(150, 0, 0));
+	SpawnPoint->SetRelativeLocation(FVector(0, 0, 100));
 	
 	GameInstance = Cast<ULunarticGameInstance>(GetGameInstance());
 	StageLevel = GameInstance->GetLevel();

@@ -8,7 +8,7 @@ AEnemy_FlameThrower::AEnemy_FlameThrower()
 	PrimaryActorTick.bCanEverTick = true;
 
 	Capsule = GetCapsuleComponent();
-	Capsule->SetCapsuleHalfHeight(120.0f);
+	Capsule->SetCapsuleHalfHeight(90.0f);
 	Capsule->SetCapsuleRadius(60.0f);
 
 	Body = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Body"));
