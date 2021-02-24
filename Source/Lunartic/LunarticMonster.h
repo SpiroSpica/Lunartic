@@ -44,4 +44,8 @@ public:
 	UFUNCTION()
 	void OnTakeDamage(int Damage);
 
+	UFUNCTION()
+	void Die();
+
+
 };

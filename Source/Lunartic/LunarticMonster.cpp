@@ -30,7 +30,12 @@ void ALunarticMonster::OnTakeDamage(int Damage)
 	if (HP <= 0)
 	{
 		MyCharacter->OnEnemyKill();
-		this->Destroy();
+		this->Die();
 	}
 }
 
+
+void ALunarticMonster::Die()
+{
+	this->Destroy();
+}

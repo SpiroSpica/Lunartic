@@ -10,6 +10,7 @@
 #include "NiagaraComponent.h"
 #include "NiagaraSystemInstance.h"
 #include "GenericPlatform/GenericPlatformMath.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "LunarticCharacter.generated.h"
 
 
