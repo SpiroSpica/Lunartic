@@ -8,7 +8,7 @@ AEnemy_FlameThrower::AEnemy_FlameThrower()
 	PrimaryActorTick.bCanEverTick = true;
 
 	Capsule = GetCapsuleComponent();
-	Capsule->SetCapsuleHalfHeight(120.0f);
+	Capsule->SetCapsuleHalfHeight(90.0f);
 	Capsule->SetCapsuleRadius(60.0f);
 
 	Body = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Body"));
@@ -40,9 +40,9 @@ AEnemy_FlameThrower::AEnemy_FlameThrower()
 	AIControllerClass = AEnemy_FlameThrower_Controller::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
-
 	GetCharacterMovement()->bUseControllerDesiredRotation = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 720.0f, 0.0f);
+	UE_LOG(LogTemp, Warning, TEXT("511"));
 
 	OnAttack = false;
 
@@ -57,7 +57,7 @@ void AEnemy_FlameThrower::BeginPlay()
 
 	Flame1->Deactivate();
 	Flame2->Deactivate();
-	HP = 200;
+	HP = 50;
 }
 
 void AEnemy_FlameThrower::Tick(float DeltaTime)

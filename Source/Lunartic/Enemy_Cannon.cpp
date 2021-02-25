@@ -60,7 +60,7 @@ AEnemy_Cannon::AEnemy_Cannon()
 	AIControllerClass = AEnemy_Cannon_Controller::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
-	HP = 200;
+	HP = 40;
 	OnAttack = false;
 
 	

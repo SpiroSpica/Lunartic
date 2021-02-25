@@ -9,6 +9,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/CapsuleComponent.h"
 #include "GenericPlatform/GenericPlatformMath.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
 #include "LunarticMonster.generated.h"
 
 UCLASS(Blueprintable)
@@ -43,5 +45,12 @@ public:
 
 	UFUNCTION()
 	void OnTakeDamage(int Damage);
+
+	UFUNCTION()
+	void Die();
+
+	UPROPERTY(EditAnywhere, Category = Visual)
+	UNiagaraSystem* DeathMotion;
+
 
 };
