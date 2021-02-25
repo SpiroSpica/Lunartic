@@ -10,6 +10,7 @@ ALunarticMonster::ALunarticMonster()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	MyCharacter = Cast<ALunarticCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	DeathMotion = CreateDefaultSubobject<UNiagaraSystem>(TEXT("DeathEffect"));
 	
 }
 
@@ -37,5 +38,6 @@ void ALunarticMonster::OnTakeDamage(int Damage)
 
 void ALunarticMonster::Die()
 {
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), DeathMotion, this->GetActorLocation(), this->GetActorRotation());
 	this->Destroy();
 }
