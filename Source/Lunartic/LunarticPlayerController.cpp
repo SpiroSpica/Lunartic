@@ -106,7 +106,7 @@ void ALunarticPlayerController::PlayerTick(float DeltaTime)
 	}
 	CharacterHP = MyCharacter->GetHP();
 
-	Hud->SetHP(CharacterHP);
+	Hud->SetHP(CharacterHP, CharacterMaxHP);
 	if (!GameEndFlag && CharacterHP <= 0)
 	{
 		GameEndFlag = true;
@@ -130,11 +130,12 @@ void ALunarticPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 	MyCharacter = Cast<ALunarticCharacter>(GetCharacter());
-
+	
+	CharacterMaxHP = MyCharacter->GetMaxHP();
 	Hud = CreateWidget<UInGameWidget>(this, HudClass);
 	Hud->AddToViewport();
 	Hud->SetKillCount(0);
-	Hud->SetHP(MyCharacter->HP);
+	Hud->SetHP(MyCharacter->HP, CharacterMaxHP);
 	Hud->SetWeaponStatus(WeaponType, Weapon[WeaponType].CurrentAmmo, Weapon[WeaponType].MaxAmmo);
 	Hud->ReloadAlarm(false);
 

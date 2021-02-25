@@ -107,6 +107,9 @@ private:
 	UPROPERTY()
 	int CharacterHP;
 
+	UPROPERTY()
+	int CharacterMaxHP;
+
 public:
 
 	//player movement function

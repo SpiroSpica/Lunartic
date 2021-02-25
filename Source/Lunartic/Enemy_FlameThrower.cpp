@@ -42,7 +42,6 @@ AEnemy_FlameThrower::AEnemy_FlameThrower()
 
 	GetCharacterMovement()->bUseControllerDesiredRotation = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 720.0f, 0.0f);
-	UE_LOG(LogTemp, Warning, TEXT("511"));
 
 	OnAttack = false;
 

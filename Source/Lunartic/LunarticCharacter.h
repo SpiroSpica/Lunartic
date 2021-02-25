@@ -72,12 +72,20 @@ public:
 	UFUNCTION()
 	int GetHP();
 
+	/* Return HP of character int value */
+	UFUNCTION()
+	int GetMaxHP();
+
+
 	/* Return enemy kill count int value */
 	UFUNCTION()
 	int GetKillCount();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	int HP;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	int MaxHP;
 
 private:
 	/** Top down camera */

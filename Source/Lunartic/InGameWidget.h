@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/TextBlock.h"
 #include "Components/Button.h"
+#include "Components/ProgressBar.h"
 #include "LunarticGameInstance.h"
 #include "Kismet/GameplayStatics.h"
 #include "InGameWidget.generated.h"
@@ -23,6 +24,9 @@ class LUNARTIC_API UInGameWidget : public UUserWidget
 public:
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	class UTextBlock* HPStat;
+
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	class UTextBlock* PercentHP;
 
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	class UTextBlock* Score;
@@ -54,11 +58,14 @@ public:
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	class UButton* ExitButton;
 
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	class UProgressBar* HealthBar;
+
 	UFUNCTION()
 	void SetKillCount(int _Count);
 
 	UFUNCTION()
-	void SetHP(int _HP);
+	void SetHP(int _HP, int _MaxHP);
 
 	UFUNCTION()
 	void SetWeaponStatus(int _WeaponNum, int _CurrentAmmo, int _MaxAmmo);

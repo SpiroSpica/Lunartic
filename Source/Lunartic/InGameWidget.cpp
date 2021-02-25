@@ -11,12 +11,17 @@ void UInGameWidget::SetKillCount(int _Count)
 	KillCount = _Count;
 }
 
-void UInGameWidget::SetHP(int _HP)
+void UInGameWidget::SetHP(int _HP, int _MaxHP)
 {
 	FString tmp = FString::Printf(TEXT("HP : %d"), _HP);
 	FText HPVal = FText::FromString(tmp);
 	HPStat->SetText(HPVal);
+	
+	float percent = (float)_HP / (float)_MaxHP;
 	HP = _HP;
+	HealthBar->SetPercent(percent);
+
+	UE_LOG(LogTemp, Warning, TEXT("%d %d"), _HP, _MaxHP);
 }
 
 void UInGameWidget::SetWeaponStatus(int _WeaponNum, int _CurrentAmmo, int _MaxAmmo)

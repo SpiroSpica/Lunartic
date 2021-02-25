@@ -96,7 +96,7 @@ ALunarticCharacter::ALunarticCharacter()
 
 	/*player hp*/
 	HP = 200;
-
+	MaxHP = 200;
 	PastRotationYaw = 0;
 }
 
@@ -192,6 +192,11 @@ void ALunarticCharacter::FireEffect(bool firing)
 int ALunarticCharacter::GetHP()
 {
 	return HP;
+}
+
+int ALunarticCharacter::GetMaxHP()
+{
+	return MaxHP;
 }
 
 /* Return enemy kill count int value */
