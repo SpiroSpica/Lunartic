@@ -18,7 +18,7 @@ class LUNARTIC_API ULunarticGameInstance : public UGameInstance
 
 public:
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void LevelUp();
 
 	UFUNCTION()
