@@ -21,6 +21,7 @@ ALunarticGameMode::ALunarticGameMode()
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
+
 }
 
 

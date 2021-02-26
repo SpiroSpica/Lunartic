@@ -25,6 +25,8 @@ public:
 	UFUNCTION()
 	bool isSucceeded();
 
+	//APawn* SpawnDefaultPawnFor(AController* NewPlayer, AActor* StartSpot) override;
+
 private:
 	UPROPERTY(VisibleAnywhere)
 	bool ClearFlag;

@@ -81,18 +81,18 @@ void UInGameWidget::SendToNextLevel()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Send to next level"));
 	GameInstance->LevelUp();
-	UGameplayStatics::OpenLevel(this,"TopDownExampleMap");
+	UGameplayStatics::OpenLevel(this,"LunarticStage");
 
 }
 
 void UInGameWidget::RetryThisLevel()
 {
-	UGameplayStatics::OpenLevel(this, "TopDownExampleMap");
+	UGameplayStatics::OpenLevel(this, "LunarticStage");
 }
 
 void UInGameWidget::BackToMenu()
 {
-	UE_LOG(LogTemp, Warning, TEXT("BackToMenu"));
+	UGameplayStatics::OpenLevel(this, "MainMenu");
 }
 
 void UInGameWidget::NativeConstruct()
