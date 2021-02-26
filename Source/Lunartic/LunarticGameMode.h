@@ -26,8 +26,6 @@ public:
 	UFUNCTION()
 	bool isSucceeded();
 
-	virtual void StartPlay() override;
-
 private:
 	UPROPERTY(VisibleAnywhere)
 	bool ClearFlag;

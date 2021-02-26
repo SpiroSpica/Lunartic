@@ -13,7 +13,7 @@ void UInGameWidget::SetKillCount(int _Count)
 
 void UInGameWidget::SetHP(int _HP, int _MaxHP)
 {
-	FString tmp = FString::Printf(TEXT("HP : %d"), _HP);
+	FString tmp = FString::Printf(TEXT("%d"), _HP);
 	FText HPVal = FText::FromString(tmp);
 	HPStat->SetText(HPVal);
 	
@@ -26,9 +26,27 @@ void UInGameWidget::SetHP(int _HP, int _MaxHP)
 
 void UInGameWidget::SetWeaponStatus(int _WeaponNum, int _CurrentAmmo, int _MaxAmmo)
 {
-	FString tmp = FString::Printf(TEXT("%d : %d / %d"),  _WeaponNum, _CurrentAmmo, _MaxAmmo);
+	FString tmp = FString::Printf(TEXT("%d / %d"),  _CurrentAmmo, _MaxAmmo);
 	FText Weapon = FText::FromString(tmp);
-	WeaponStat->SetText(Weapon);
+	AmmoStat->SetText(Weapon);
+
+	FString tmp2;
+	switch (_WeaponNum)
+	{
+	case 0:
+		tmp2 = FString::Printf(TEXT("Projectile"));
+		break;
+	case 1:
+		tmp2 = FString::Printf(TEXT("MACHINE GUN"));
+		break;
+	case 2:
+		tmp2 = FString::Printf(TEXT("GERNADE"));
+		break;
+	case 3:
+		tmp2 = FString::Printf(TEXT("SHOTGUN"));
+		break;
+	}
+	WeaponStat->SetText(FText::FromString(tmp2));
 	WeaponNum = _WeaponNum;
 	CurrentAmmo = _CurrentAmmo;
 	MaxAmmo = _MaxAmmo;

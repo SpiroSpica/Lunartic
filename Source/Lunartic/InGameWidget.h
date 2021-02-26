@@ -35,6 +35,9 @@ public:
 	class UTextBlock* WeaponStat;
 
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	class UTextBlock* AmmoStat;
+
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	class UTextBlock* ReloadText;
 
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
