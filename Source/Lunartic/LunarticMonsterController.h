@@ -33,6 +33,7 @@ public:
 	static const FName TargetKey;
 	static const FName HomePosKey;
 
+
 protected:
 	UPROPERTY()
 	class UBehaviorTree* BTAsset;

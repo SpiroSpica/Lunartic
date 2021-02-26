@@ -56,6 +56,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UNiagaraComponent* HoverSmoke;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UNiagaraSystem* GunTrace;
+
 	/* De/Activate Niagra Effect (Shooting) */
 	UFUNCTION()
 	void FireEffect(bool firing);
@@ -76,6 +79,8 @@ public:
 	UFUNCTION()
 	int GetMaxHP();
 
+	UFUNCTION()
+	void DrawTrace(FVector offset, FVector end);
 
 	/* Return enemy kill count int value */
 	UFUNCTION()

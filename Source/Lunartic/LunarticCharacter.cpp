@@ -73,6 +73,9 @@ ALunarticCharacter::ALunarticCharacter()
 	HoverSmoke = CreateDefaultSubobject<UNiagaraComponent>("HoverSmoke");
 	HoverSmoke->SetupAttachment(Outfit);
 	
+	GunTrace = CreateDefaultSubobject<UNiagaraSystem>(TEXT("Trace"));
+	
+
 
 	// Create a decal in the world to show the cursor's location
 	CursorToWorld = CreateDefaultSubobject<UDecalComponent>("CursorToWorld");
@@ -197,6 +200,12 @@ int ALunarticCharacter::GetHP()
 int ALunarticCharacter::GetMaxHP()
 {
 	return MaxHP;
+}
+
+void ALunarticCharacter::DrawTrace(FVector offset, FVector end)
+{
+	UNiagaraComponent* trace = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), GunTrace, Shoot->GetComponentLocation());
+	trace->SetVectorParameter("EndPoint", end);
 }
 
 /* Return enemy kill count int value */

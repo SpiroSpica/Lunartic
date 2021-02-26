@@ -56,7 +56,7 @@ ALunarticPlayerController::ALunarticPlayerController()
 	
 
 	RequiredKill = 40;
-
+	
 	static ConstructorHelpers::FClassFinder<UInGameWidget> UI_HUD(TEXT("WidgetBlueprint'/Game/UI/InGameWidget_BP.InGameWidget_BP_C'"));
 	if (UI_HUD.Succeeded())
 	{
@@ -273,23 +273,25 @@ void ALunarticPlayerController::HitScan()
 	notShooting = false;
 	FHitResult target;
 
-	FName TraceLine("HitScanTrace");
+	//FName TraceLine("HitScanTrace");
 
-	GetWorld()->DebugDrawTraceTag = TraceLine;
+	//GetWorld()->DebugDrawTraceTag = TraceLine;
 	FVector offset = MyCharacter->GetActorRotation().Vector() * 120 + FVector(0, 0, 85);
 	FVector start = MyCharacter->GetActorLocation() + offset;
 	float RandomValRoll = FMath::RandRange(-3, 3);
 	float RandomValPitch = FMath::RandRange(-3, 3);
 	//add rebound from shooting by adding Random value to Yaw
-
 	FVector end = start + (MyCharacter->GetActorRotation() + FRotator(RandomValRoll, RandomValPitch, 0)).Vector() * 10000.0f;
+	
+	MyCharacter->DrawTrace(offset, end);
+
 	
 	FCollisionQueryParams collisionParams;
 	collisionParams.bTraceComplex = true;
 	collisionParams.bDebugQuery = true;
 	collisionParams.bIgnoreBlocks = false;
 	collisionParams.AddIgnoredActor(MyCharacter);
-	collisionParams.TraceTag = TraceLine;
+	//collisionParams.TraceTag = TraceLine;
 	
 	if (MyCharacter->GetWorld()->LineTraceSingleByChannel(target, start, end, ECC_WorldStatic, collisionParams))
 	{
@@ -313,9 +315,9 @@ void ALunarticPlayerController::Shotgun()
 	notShooting = false;
 	FHitResult target;
 
-	FName TraceLine("HitScanTrace");
+	//FName TraceLine("HitScanTrace");
 
-	GetWorld()->DebugDrawTraceTag = TraceLine;
+	//GetWorld()->DebugDrawTraceTag = TraceLine;
 	FVector offset = MyCharacter->GetActorRotation().Vector() * 120 + FVector(0, 0, 85);
 	FVector start = MyCharacter->GetActorLocation() + offset;
 	FCollisionQueryParams collisionParams;
@@ -323,7 +325,7 @@ void ALunarticPlayerController::Shotgun()
 	collisionParams.bDebugQuery = true;
 	collisionParams.bIgnoreBlocks = false;
 	collisionParams.AddIgnoredActor(MyCharacter);
-	collisionParams.TraceTag = TraceLine;
+	//collisionParams.TraceTag = TraceLine;
 
 	for (int i = 0; i < 50; i++)
 	{
@@ -334,6 +336,7 @@ void ALunarticPlayerController::Shotgun()
 		FVector end = start + (MyCharacter->GetActorRotation() + FRotator(RandomValRoll, RandomValPitch, 0)).Vector() * 1200.0f;
 		//FVector end = start + MyCharacter->GetActorRotation().Vector() * 10000.0f;
 
+		MyCharacter->DrawTrace(offset, end);
 
 		if (MyCharacter->GetWorld()->LineTraceSingleByChannel(target, start, end, ECC_WorldStatic, collisionParams))
 		{
