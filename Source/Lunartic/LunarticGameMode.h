@@ -6,6 +6,7 @@
 #include "InGameWidget.h"
 #include "GameFramework/GameModeBase.h"
 #include "Components/WidgetComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "LunarticGameMode.generated.h"
 
 UCLASS(minimalapi)
@@ -25,7 +26,7 @@ public:
 	UFUNCTION()
 	bool isSucceeded();
 
-	//APawn* SpawnDefaultPawnFor(AController* NewPlayer, AActor* StartSpot) override;
+	virtual void StartPlay() override;
 
 private:
 	UPROPERTY(VisibleAnywhere)

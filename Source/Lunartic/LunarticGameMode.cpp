@@ -40,3 +40,14 @@ bool ALunarticGameMode::isSucceeded()
 {
 	return FailFlag;
 }
+
+void ALunarticGameMode::StartPlay()
+{
+	UKismetSystemLibrary::PrintString(GetWorld(), GetWorld()->GetMapName(),true, true, FLinearColor::Red,15.0f);
+	if(GetWorld()->GetMapName().Equals("UEDPIE_0_MainMenu"))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Enter"));
+		DefaultPawnClass = NULL;
+	}
+	Super::StartPlay();
+}
